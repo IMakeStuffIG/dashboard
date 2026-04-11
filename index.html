@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empire Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+ const firebaseConfig = {
+  apiKey: "AIzaSyCMQMSeHWSHDVZnVFq5JknhQYEMQjzq6Uo",
+  authDomain: "productivity-1fc58.firebaseapp.com",
+  projectId: "productivity-1fc58",
+  storageBucket: "productivity-1fc58.firebasestorage.app",
+  messagingSenderId: "326423432805",
+  appId: "1:326423432805:web:96ba1d5ae84d556599808c"
+};
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+  const col = (n) => collection(db, n);
+
+  window._db = {
+    async add(t, d)        { return await addDoc(col(t), { ...d, createdAt: serverTimestamp() }); },
+    async update(t, id, d) { return await updateDoc(doc(db, t, id), d); },
+    async del(t, id)       { return await deleteDoc(doc(db, t, id)); },
+    listen(t, cb) {
+      return onSnapshot(query(col(t), orderBy('createdAt','asc')), s => cb(s.docs.map(d => ({ id: d.id, ...d.data() }))));
+    }
+  };
+  window._dbReady = true;
+  window.dispatchEvent(new Event('db-ready'));
+</script>
+
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box }
+
+:root {
+  --bg:        #0d0d0d;
+  --bg2:       #111111;
+  --bg3:       #161616;
+  --bg4:       #1c1c1c;
+  --border:    #2a2a2a;
+  --border2:   #333333;
+  --text:      #e8e8e8;
+  --t2:        #888888;
+  --t3:        #555555;
+  --t4:        #3a3a3a;
+
+  --green:     #4ade80;
+  --green-dim: #1a3d28;
+  --red:       #f87171;
+  --red-dim:   #3d1a1a;
+  --amber:     #fbbf24;
+  --blue:      #60a5fa;
+  --blue-dim:  #1a2840;
+
+  --accent:    #e8e8e8;
+
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'Syne', sans-serif;
+
+  --sidebar: 220px;
+  --r: 6px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; height: 4px }
+::-webkit-scrollbar-track { background: transparent }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px }
+
+/* ── LAYOUT ── */
+.shell { display: flex; min-height: 100vh }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar);
+  flex-shrink: 0;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 24px 12px;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.logo {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+  padding: 0 10px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo-mark {
+  width: 20px; height: 20px;
+  background: var(--text);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.nav-section {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t3);
+  padding: 0 10px;
+  margin-bottom: 6px;
+  margin-top: 20px;
+}
+.nav-section:first-of-type { margin-top: 0 }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--r);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t2);
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: var(--sans);
+  transition: color 0.12s, background 0.12s;
+  position: relative;
+}
+.nav-item .ni-icon {
+  font-size: 14px;
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text) }
+.nav-item.active { background: var(--bg4); color: var(--text) }
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 6px; bottom: 6px;
+  width: 2px;
+  background: var(--text);
+  border-radius: 0 2px 2px 0;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t3);
+}
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--t3); flex-shrink: 0; transition: background 0.3s }
+.status-dot.ok  { background: var(--green) }
+.status-dot.err { background: var(--red) }
+
+/* ── CONTENT ── */
+.content {
+  margin-left: var(--sidebar);
+  flex: 1;
+  padding: 32px 36px;
+  max-width: 1100px;
+}
+
+.page { display: none }
+.page.active { display: block; animation: fadeUp 0.16s ease }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px) }
+  to   { opacity: 1; transform: none }
+}
+
+/* ── PAGE HEADER ── */
+.ph {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.ph h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.ph p {
+  font-size: 12px;
+  color: var(--t2);
+  margin-top: 2px;
+  font-family: var(--mono);
+}
+.ph-actions { display: flex; gap: 8px; align-items: center }
+
+/* ── STAT CARDS ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin-bottom: 20px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.stat-card {
+  background: var(--bg2);
+  padding: 18px 20px;
+}
+.stat-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 8px;
+}
+.stat-value {
+  font-family: var(--mono);
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.stat-value.green { color: var(--green) }
+.stat-value.red   { color: var(--red) }
+.stat-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t3);
+  margin-top: 4px;
+}
+
+/* ── GOAL BANNER ── */
+.goal-banner {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.goal-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+.goal-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--t2);
+}
+.goal-nums {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--t3);
+}
+.track {
+  height: 3px;
+  background: var(--bg4);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 99px;
+  transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 2px;
+}
+.goal-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t3);
+}
+
+/* ── CHARTS ── */
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px 20px;
+}
+.card-title {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 14px;
+}
+.chart-wrap { position: relative; height: 160px }
+.pie-wrap   { position: relative; height: 130px; margin-bottom: 12px }
+
+.pie-legend { display: flex; flex-direction: column; gap: 5px }
+.pie-li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--t2);
+}
+.pie-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0 }
+.pie-val { margin-left: auto; color: var(--text) }
+
+/* ── HOME GRID ── */
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+/* ── SEC HEADER ── */
+.sec-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.sec-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t3);
+}
+
+/* ── TASKS (HOME) ── */
+.tasks-panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.tasks-panel-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.tasks-panel-hdr .sec-label { margin-bottom: 0 }
+.tasks-inner { flex: 1; overflow-y: auto; max-height: 280px; padding: 10px 12px }
+.quick-add-row {
+  display: flex;
+  gap: 6px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+}
+.quick-add-row input { flex: 1; font-size: 12px }
+
+/* ── BIZ SUMMARY ── */
+.biz-summary { display: flex; flex-direction: column; gap: 6px }
+.biz-row {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 8px 1fr repeat(3, 80px);
+  align-items: center;
+  gap: 12px;
+}
+.biz-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0 }
+.biz-name-cell .name { font-size: 13px; font-weight: 600 }
+.biz-name-cell .meta { font-family: var(--mono); font-size: 10px; color: var(--t3); margin-top: 1px }
+.biz-num { text-align: right }
+.biz-num .lbl { font-family: var(--mono); font-size: 9px; color: var(--t3); margin-bottom: 2px }
+.biz-num .val { font-family: var(--mono); font-size: 13px; font-weight: 500 }
+
+/* ── TASK ITEMS ── */
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  transition: opacity 0.2s;
+}
+.task-item:last-child { border-bottom: none }
+.task-item.faded { opacity: 0.35 }
+
+.task-check {
+  width: 16px; height: 16px;
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  flex-shrink: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s;
+}
+.task-check:hover { border-color: var(--green) }
+.task-check.on { background: var(--green); border-color: var(--green) }
+.task-check.on::after {
+  content: '';
+  width: 4px; height: 7px;
+  border: 1.5px solid #000;
+  border-top: none; border-left: none;
+  transform: rotate(45deg) translateY(-1px);
+  display: block;
+}
+.task-text {
+  flex: 1;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text);
+}
+.task-text.struck { text-decoration: line-through; color: var(--t3) }
+.task-del {
+  background: none; border: none;
+  cursor: pointer;
+  color: var(--t3);
+  font-size: 12px;
+  padding: 0 2px;
+  opacity: 0;
+  transition: opacity 0.12s;
+  font-family: var(--mono);
+}
+.task-item:hover .task-del { opacity: 1 }
+.task-del:hover { color: var(--red) }
+
+/* ── TABS ── */
+.tab-row {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.tab-btn {
+  background: none; border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--sans);
+  color: var(--t3);
+  cursor: pointer;
+  margin-bottom: -1px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: color 0.12s;
+}
+.tab-btn:hover { color: var(--t2) }
+.tab-btn.active { color: var(--text); border-bottom-color: var(--text) }
+
+/* ── BIZ CARDS (TASK PAGE) ── */
+.biz-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.biz-card-hdr {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.12s;
+}
+.biz-card-hdr:hover { background: var(--bg3) }
+.biz-card-hdr .biz-dot { flex-shrink: 0 }
+.biz-card-hdr .biz-name { font-size: 14px; font-weight: 600; flex: 1 }
+.biz-card-hdr .biz-meta { font-family: var(--mono); font-size: 10px; color: var(--t3) }
+.biz-hdr-acts { display: flex; gap: 4px; align-items: center }
+.biz-body {
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+.biz-section { padding: 14px 16px; border-bottom: 1px solid var(--border) }
+.biz-section:last-child { border-bottom: none }
+.biz-sec-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px }
+.biz-sec-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t3) }
+
+/* ── BIZ GOAL CARDS ── */
+.bg-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.bg-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+}
+.bg-check {
+  width: 16px; height: 16px;
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.bg-check.on { background: var(--green); border-color: var(--green) }
+.bg-check.on::after {
+  content: '';
+  width: 4px; height: 7px;
+  border: 1.5px solid #000;
+  border-top: none; border-left: none;
+  transform: rotate(45deg) translateY(-1px);
+  display: block;
+}
+.bg-name { flex: 1; font-size: 13px; font-weight: 500 }
+.bg-name.done { text-decoration: line-through; color: var(--t3); font-weight: 400 }
+.bg-money { font-family: var(--mono); font-size: 11px; color: var(--t2); flex-shrink: 0 }
+.bg-caret {
+  background: none; border: none;
+  cursor: pointer;
+  color: var(--t3);
+  font-size: 10px;
+  padding: 0 2px;
+  transition: transform 0.2s;
+  line-height: 1;
+  font-family: var(--mono);
+}
+.bg-caret.open { transform: rotate(180deg) }
+.bg-del {
+  background: none; border: none;
+  cursor: pointer;
+  color: var(--t3);
+  font-size: 11px;
+  padding: 0 2px;
+  opacity: 0;
+  transition: opacity 0.12s;
+  font-family: var(--mono);
+}
+.bg-row:hover .bg-del { opacity: 1 }
+.bg-del:hover { color: var(--red) }
+.bg-body { border-top: 1px solid var(--border); background: var(--bg) }
+
+.sub-row { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 38px }
+.sub-row:hover { background: var(--bg2) }
+.sub-ck {
+  width: 13px; height: 13px;
+  border: 1px solid var(--border2);
+  border-radius: 3px;
+  flex-shrink: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s;
+}
+.sub-ck.on { background: var(--green); border-color: var(--green) }
+.sub-ck.on::after {
+  content: '';
+  width: 3px; height: 5px;
+  border: 1.5px solid #000;
+  border-top: none; border-left: none;
+  transform: rotate(45deg) translateY(-1px);
+  display: block;
+}
+.sub-txt { flex: 1; font-size: 12px; color: var(--t2); cursor: pointer }
+.sub-txt.done { text-decoration: line-through; color: var(--t3) }
+.sub-del { background: none; border: none; cursor: pointer; color: var(--t3); font-family: var(--mono); font-size: 11px; opacity: 0; transition: opacity 0.12s }
+.sub-row:hover .sub-del { opacity: 1 }
+.sub-del:hover { color: var(--red) }
+
+.add-sub-row { display: flex; gap: 6px; padding: 6px 12px 8px 38px; border-top: 1px solid var(--border) }
+.add-sub-row input { flex: 1; font-size: 12px }
+
+.tx-footer { display: flex; gap: 6px; padding: 8px 12px 10px 38px; border-top: 1px solid var(--border) }
+.txbtn {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  border: 1px solid var(--border2);
+  background: var(--bg2);
+  cursor: pointer;
+  color: var(--t2);
+  transition: all 0.12s;
+}
+.txbtn:hover { background: var(--bg3); color: var(--text) }
+.txbtn.inc { border-color: #1a3d28; color: var(--green) }
+.txbtn.inc:hover { background: var(--green-dim) }
+.txbtn.xp { border-color: #3d1a1a; color: var(--red) }
+.txbtn.xp:hover { background: var(--red-dim) }
+
+/* ── FINANCIALS ── */
+.table-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+table { width: 100%; border-collapse: collapse }
+thead th {
+  padding: 10px 16px;
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--t3);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg3);
+}
+tbody td { padding: 11px 16px; border-bottom: 1px solid var(--border); font-size: 13px }
+tbody tr:last-child td { border-bottom: none }
+tbody tr:hover td { background: var(--bg3) }
+tfoot td { padding: 11px 16px; font-family: var(--mono); font-size: 12px; border-top: 1px solid var(--border2) }
+.mono { font-family: var(--mono) }
+.tg { color: var(--green) }
+.tr { color: var(--red) }
+.tm { color: var(--t3) }
+
+.tx-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.tx-item:last-child { border-bottom: none }
+.tx-item:hover { background: var(--bg3) }
+.tx-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0 }
+.tx-amt { font-family: var(--mono); font-size: 13px; font-weight: 500 }
+.tx-label { font-size: 13px }
+.tx-sub { font-family: var(--mono); font-size: 10px; color: var(--t3); margin-top: 1px }
+
+.exp-cat {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.ct { background: var(--blue-dim); color: var(--blue) }
+.ca { background: #2a1a40; color: #c084fc }
+.cs { background: var(--green-dim); color: var(--green) }
+.co { background: var(--bg4); color: var(--t3) }
+
+/* ── FORMS / INPUTS ── */
+input, select, textarea {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  padding: 8px 10px;
+  outline: none;
+  transition: border-color 0.12s;
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--text) }
+select { cursor: pointer }
+select option { background: var(--bg3) }
+.fr { margin-bottom: 12px }
+.fr label { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--t3); margin-bottom: 5px }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px }
+
+button.primary {
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--r);
+  padding: 8px 14px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.12s;
+  letter-spacing: 0.02em;
+}
+button.primary:hover { opacity: 0.85 }
+button.primary:disabled { opacity: 0.4; cursor: not-allowed }
+button.primary.sm { padding: 6px 12px; font-size: 11px }
+
+button.secondary {
+  background: none;
+  color: var(--t2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  padding: 8px 12px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+button.secondary:hover { background: var(--bg3); color: var(--text) }
+button.secondary.sm { padding: 6px 10px; font-size: 11px }
+
+button.ghost {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--t3);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.12s;
+  font-family: var(--sans);
+}
+button.ghost:hover { background: var(--bg4); color: var(--text) }
+
+.act-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--t3);
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  transition: all 0.12s;
+}
+.act-btn:hover { background: var(--bg4); color: var(--text) }
+.act-btn.del:hover { color: var(--red) }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+.modal-overlay.open { display: flex }
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 26px 24px 20px;
+  width: 420px;
+  max-width: 94vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+}
+.modal h2 {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 18px;
+  color: var(--text);
+}
+.modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px }
+
+/* ── MISC ── */
+.empty {
+  padding: 32px 20px;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--t3);
+}
+.empty-sm {
+  padding: 10px 4px;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--t3);
+}
+
+#toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--text);
+  color: var(--bg);
+  padding: 9px 16px;
+  border-radius: var(--r);
+  font-family: var(--mono);
+  font-size: 11px;
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+  z-index: 999;
+}
+#toast.show { opacity: 1 }
+
+.cfg-notice {
+  background: #2a2000;
+  border: 1px solid #554000;
+  border-radius: var(--r);
+  padding: 12px 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--amber);
+  margin-bottom: 20px;
+  display: none;
+}
+
+.swatches { display: flex; gap: 8px; flex-wrap: wrap }
+.swatch {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.12s, transform 0.1s;
+}
+.swatch:hover { transform: scale(1.12) }
+.swatch.sel { border-color: var(--text); transform: scale(1.12) }
+
+.task-group-sep {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--t3);
+  padding: 10px 0 6px;
+  display: block;
+}
+.task-group-sep:first-child { padding-top: 0 }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark"></div>
+      Empire
+    </div>
+
+    <div class="nav-section">Main</div>
+    <button class="nav-item active" onclick="showPage('home',this)">
+      <span class="ni-icon">▦</span> Overview
+    </button>
+    <button class="nav-item" onclick="showPage('financial',this)">
+      <span class="ni-icon">◈</span> Financials
+    </button>
+    <button class="nav-item" onclick="showPage('tasks',this)">
+      <span class="ni-icon">◎</span> Goals & Tasks
+    </button>
+    <button class="nav-item" onclick="showPage('expenses',this)">
+      <span class="ni-icon">◇</span> Expenses
+    </button>
+
+    <div class="sidebar-footer">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Connecting…</span>
+    </div>
+  </aside>
+
+  <main class="content">
+    <div class="cfg-notice" id="cfgNotice">
+      Firebase not configured — replace the firebaseConfig at the top of this file.
+    </div>
+
+    <!-- ══ HOME ══ -->
+    <div class="page active" id="page-home">
+      <div class="ph">
+        <div>
+          <h1>Good <span id="timeGreeting">morning</span></h1>
+          <p id="todayDate"></p>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Revenue</div>
+          <div class="stat-value green" id="s-rev">$0</div>
+          <div class="stat-sub" id="s-rev-sub">0 businesses</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Expenses</div>
+          <div class="stat-value red" id="s-exp">$0</div>
+          <div class="stat-sub" id="s-exp-sub">0 transactions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Net Profit</div>
+          <div class="stat-value" id="s-net">$0</div>
+          <div class="stat-sub" id="s-net-sub">—</div>
+        </div>
+      </div>
+
+      <div class="goal-banner">
+        <div class="goal-top">
+          <span class="goal-label">Road to $1,000,000</span>
+          <span class="goal-nums" id="goalNums">$0 / $1,000,000</span>
+        </div>
+        <div class="track"><div class="fill" id="goalBar" style="width:0%"></div></div>
+        <div class="goal-foot">
+          <span>$0</span>
+          <span id="goalPct">0.00% there</span>
+          <span>$1,000,000</span>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="card">
+          <div class="card-title">Net worth over time</div>
+          <div class="chart-wrap"><canvas id="lineChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Revenue by business</div>
+          <div class="pie-wrap"><canvas id="pieChart"></canvas></div>
+          <div class="pie-legend" id="pieLegend"></div>
+        </div>
+      </div>
+
+      <div class="home-grid">
+        <!-- Businesses -->
+        <div>
+          <div class="sec-hdr">
+            <span class="sec-label">Businesses</span>
+            <button class="primary sm" onclick="openModal('addBusiness')">+ Add</button>
+          </div>
+          <div id="home-biz" class="biz-summary"></div>
+        </div>
+
+        <!-- Daily Tasks (home panel) -->
+        <div>
+          <div class="sec-hdr">
+            <span class="sec-label">Today's Tasks</span>
+          </div>
+          <div class="tasks-panel">
+            <div class="tasks-inner" id="home-tasks"></div>
+            <div class="quick-add-row">
+              <input type="text" id="home-task-input" placeholder="Quick add task…" onkeydown="if(event.key==='Enter')quickAddTask()">
+              <button class="primary sm" onclick="quickAddTask()">Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ FINANCIALS ══ -->
+    <div class="page" id="page-financial">
+      <div class="ph">
+        <div>
+          <h1>Financials</h1>
+          <p>Revenue and expenses by business</p>
+        </div>
+        <div class="ph-actions">
+          <button class="primary sm" onclick="openModal('logIncome')">+ Income</button>
+          <button class="secondary sm" onclick="openModal('logExpense')">− Expense</button>
+        </div>
+      </div>
+      <div class="table-card" style="margin-bottom:16px">
+        <table>
+          <thead>
+            <tr><th>Business / Goal</th><th>Revenue</th><th>Expenses</th><th>Net</th><th></th></tr>
+          </thead>
+          <tbody id="finBody">
+            <tr><td colspan="5"><div class="empty">No businesses yet.</div></td></tr>
+          </tbody>
+          <tfoot id="finFoot"></tfoot>
+        </table>
+      </div>
+      <div class="sec-hdr"><span class="sec-label">All transactions</span></div>
+      <div class="table-card"><div id="txList"><div class="empty">No transactions yet.</div></div></div>
+    </div>
+
+    <!-- ══ TASKS ══ -->
+    <div class="page" id="page-tasks">
+      <div class="ph">
+        <div>
+          <h1>Goals & Tasks</h1>
+          <p>Daily checklist and business goals</p>
+        </div>
+        <div id="tasks-hdr-btn" class="ph-actions"></div>
+      </div>
+      <div class="tab-row">
+        <button class="tab-btn active" id="ttab-d" onclick="switchTaskTab('daily')">Daily Tasks</button>
+        <button class="tab-btn" id="ttab-b" onclick="switchTaskTab('business')">Business</button>
+      </div>
+      <div id="pane-daily"><div id="daily-list"></div></div>
+      <div id="pane-biz" style="display:none"><div id="biz-list"></div></div>
+    </div>
+
+    <!-- ══ EXPENSES ══ -->
+    <div class="page" id="page-expenses">
+      <div class="ph">
+        <div>
+          <h1>Expenses</h1>
+          <p>Everything you've spent</p>
+        </div>
+        <button class="primary sm" onclick="openModal('logExpense')">+ Add expense</button>
+      </div>
+      <div class="stats-row" id="expStats" style="margin-bottom:16px; grid-template-columns: repeat(4,1fr)"></div>
+      <div class="table-card">
+        <table>
+          <thead><tr><th>Description</th><th>Category</th><th>Business</th><th>Goal</th><th>Date</th><th>Amount</th><th></th></tr></thead>
+          <tbody id="expBody"><tr><td colspan="7"><div class="empty">No expenses yet.</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalBox"></div>
+</div>
+<div id="toast"></div>
+
+<script>
+// ─── STATE ──────────────────────────────────────
+let businesses = [];
+let bizGoals   = [];
+let tasks      = [];
+let txns       = [];
+let expenses   = [];
+let snapshots  = [];
+
+let lineChart, pieChart;
+let _busy = false;
+let currentTab = 'daily';
+
+const COLORS = ['#4ade80','#60a5fa','#f472b6','#fb923c','#a78bfa','#34d399','#fbbf24','#f87171'];
+let _selColor = COLORS[0];
+
+const fmt  = n => '$'+(+(n||0)).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2});
+const fmtD = d => d ? new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+const today = () => new Date().toISOString().split('T')[0];
+
+// ─── AGGREGATES ─────────────────────────────────
+const bizRev  = id => txns.filter(t=>t.businessId===id&&t.type==='income').reduce((s,t)=>s+(+t.amount||0),0);
+const bizExp  = id => expenses.filter(e=>e.businessId===id).reduce((s,e)=>s+(+e.amount||0),0);
+const goalRev = id => txns.filter(t=>t.bizGoalId===id&&t.type==='income').reduce((s,t)=>s+(+t.amount||0),0);
+const goalExp = id => expenses.filter(e=>e.bizGoalId===id).reduce((s,e)=>s+(+e.amount||0),0);
+const totRev  = () => txns.filter(t=>t.type==='income').reduce((s,t)=>s+(+t.amount||0),0);
+const totExp  = () => expenses.reduce((s,e)=>s+(+e.amount||0),0);
+const netP    = () => totRev()-totExp();
+
+// ─── BOOT ───────────────────────────────────────
+window.addEventListener('db-ready', () => {
+  setDot('ok','Connected');
+  const db = window._db;
+  db.listen('businesses', d=>{businesses=d;renderAll()});
+  db.listen('bizGoals',   d=>{bizGoals=d;renderAll()});
+  db.listen('tasks',      d=>{tasks=d;renderAll()});
+  db.listen('txns',       d=>{txns=d;renderAll()});
+  db.listen('expenses',   d=>{expenses=d;renderAll()});
+  db.listen('snapshots',  d=>{snapshots=d;renderAll()});
+  initCharts();
+});
+setTimeout(()=>{
+  if(!window._dbReady){
+    setDot('err','Not connected');
+    document.getElementById('cfgNotice').style.display='block';
+  }
+},5000);
+
+function setDot(c,t){
+  document.getElementById('statusDot').className='status-dot '+c;
+  document.getElementById('statusText').textContent=t;
+}
+
+// ─── RENDER ALL ─────────────────────────────────
+function renderAll(){
+  renderStats();
+  renderBanner();
+  renderCharts();
+  renderHomeBiz();
+  renderHomeTasks();
+  renderDailyTasks();
+  renderBizTab();
+  renderFinancials();
+  renderTxList();
+  renderExpenses();
+  renderExpStats();
+}
+
+// ─── STATS ──────────────────────────────────────
+function renderStats(){
+  const r=totRev(), e=totExp(), n=netP();
+  document.getElementById('s-rev').textContent=fmt(r);
+  document.getElementById('s-exp').textContent=fmt(e);
+  const nel=document.getElementById('s-net');
+  nel.textContent=fmt(Math.abs(n));
+  nel.className='stat-value '+(n>=0?'green':'red');
+  document.getElementById('s-net-sub').textContent=n>=0?'in profit':'in loss';
+  document.getElementById('s-rev-sub').textContent=`${businesses.length} business${businesses.length!==1?'es':''}`;
+  document.getElementById('s-exp-sub').textContent=`${expenses.length} transaction${expenses.length!==1?'s':''}`;
+}
+
+function renderBanner(){
+  const n=netP(), pct=Math.min(100,Math.max(0,(n/1000000)*100));
+  document.getElementById('goalBar').style.width=pct.toFixed(2)+'%';
+  document.getElementById('goalPct').textContent=pct.toFixed(2)+'% there';
+  document.getElementById('goalNums').textContent=fmt(n)+' / $1,000,000';
+}
+
+// ─── CHARTS ─────────────────────────────────────
+function initCharts(){
+  const gridColor='rgba(255,255,255,0.04)';
+  const tickColor='#555555';
+
+  lineChart=new Chart(document.getElementById('lineChart').getContext('2d'),{
+    type:'line',
+    data:{labels:[],datasets:[{
+      label:'Net',data:[],
+      borderColor:'#4ade80',
+      backgroundColor:'rgba(74,222,128,0.06)',
+      borderWidth:1.5,
+      pointBackgroundColor:'#4ade80',
+      pointRadius:3,
+      tension:.35,fill:true
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmt(c.parsed.y)},backgroundColor:'#1c1c1c',borderColor:'#333',borderWidth:1,titleColor:'#888',bodyColor:'#e8e8e8'}},
+      scales:{
+        x:{grid:{color:gridColor},ticks:{color:tickColor,font:{size:10,family:'IBM Plex Mono'}}},
+        y:{grid:{color:gridColor},ticks:{color:tickColor,font:{size:10,family:'IBM Plex Mono'},callback:v=>fmt(v)}}
+      }
+    }
+  });
+
+  pieChart=new Chart(document.getElementById('pieChart').getContext('2d'),{
+    type:'doughnut',
+    data:{labels:[],datasets:[{data:[],backgroundColor:[],borderWidth:0,hoverOffset:4}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,cutout:'68%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmt(c.parsed)},backgroundColor:'#1c1c1c',borderColor:'#333',borderWidth:1,bodyColor:'#e8e8e8'}}
+    }
+  });
+}
+
+function renderCharts(){
+  if(!lineChart) return;
+  const sorted=[...snapshots].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  lineChart.data.labels=sorted.length?sorted.map(s=>fmtD(s.date)):['Today'];
+  lineChart.data.datasets[0].data=sorted.length?sorted.map(s=>+s.amount||0):[netP()];
+  lineChart.update();
+
+  const bwr=businesses.filter(b=>bizRev(b.id)>0);
+  const lg=document.getElementById('pieLegend');
+  if(bwr.length){
+    pieChart.data.labels=bwr.map(b=>b.name);
+    pieChart.data.datasets[0].data=bwr.map(b=>bizRev(b.id));
+    pieChart.data.datasets[0].backgroundColor=bwr.map(b=>b.color||'#4ade80');
+    lg.innerHTML=bwr.map(b=>`<div class="pie-li">
+      <span class="pie-dot" style="background:${b.color||'#4ade80'}"></span>
+      <span>${b.name}</span>
+      <span class="pie-val">${fmt(bizRev(b.id))}</span>
+    </div>`).join('');
+  } else {
+    pieChart.data.labels=['No data'];
+    pieChart.data.datasets[0].data=[1];
+    pieChart.data.datasets[0].backgroundColor=['#2a2a2a'];
+    lg.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--t3)">Log income to see breakdown.</div>';
+  }
+  pieChart.update();
+}
+
+// ─── HOME PANELS ────────────────────────────────
+function renderHomeBiz(){
+  const el=document.getElementById('home-biz');
+  if(!businesses.length){
+    el.innerHTML='<div class="empty" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r)">No businesses yet.</div>';
+    return;
+  }
+  el.innerHTML=businesses.map(b=>{
+    const r=bizRev(b.id), e=bizExp(b.id), n=r-e;
+    const gc=bizGoals.filter(g=>g.businessId===b.id).length;
+    return `<div class="biz-row">
+      <div class="biz-dot" style="background:${b.color||'#4ade80'}"></div>
+      <div class="biz-name-cell">
+        <div class="name">${b.name}</div>
+        <div class="meta">${gc} goal${gc!==1?'s':''}</div>
+      </div>
+      <div class="biz-num"><div class="lbl">Rev</div><div class="val tg">${fmt(r)}</div></div>
+      <div class="biz-num"><div class="lbl">Exp</div><div class="val tr">${fmt(e)}</div></div>
+      <div class="biz-num"><div class="lbl">Net</div><div class="val ${n>=0?'tg':'tr'}">${fmt(n)}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderHomeTasks(){
+  const el=document.getElementById('home-tasks');
+  const personal=tasks.filter(t=>!t.businessId);
+  const sortedTasks=[...personal.filter(t=>!t.done),...personal.filter(t=>t.done)];
+  if(!sortedTasks.length){
+    el.innerHTML='<div class="empty-sm" style="color:var(--t3)">No tasks — add one below.</div>';
+    return;
+  }
+  el.innerHTML=sortedTasks.map(t=>taskHtml(t)).join('');
+}
+
+// ─── DAILY TASKS (TASKS PAGE) ───────────────────
+function renderDailyTasks(){
+  const el=document.getElementById('daily-list');
+  const personal=tasks.filter(t=>!t.businessId);
+  const fromBiz =tasks.filter(t=>t.businessId);
+  const sortTasks=arr=>[...arr.filter(t=>!t.done),...arr.filter(t=>t.done)];
+  let html='';
+
+  html+=`<div class="sec-hdr" style="margin-bottom:10px">
+    <span class="sec-label">Personal</span>
+    <button class="primary sm" onclick="openModal('addTask')">+ Add task</button>
+  </div>`;
+
+  if(!personal.length){
+    html+='<div class="empty-sm" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:16px;padding:14px">No personal tasks yet.</div>';
+  } else {
+    html+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px 12px;margin-bottom:16px">'+sortTasks(personal).map(t=>taskHtml(t)).join('')+'</div>';
+  }
+
+  if(fromBiz.length){
+    html+=`<div class="sec-label" style="display:block;margin-bottom:10px">From Businesses</div>`;
+    const bizIds=[...new Set(fromBiz.map(t=>t.businessId))];
+    bizIds.forEach(bid=>{
+      const biz=businesses.find(b=>b.id===bid);
+      const col=biz?.color||'#4ade80';
+      const bTasks=fromBiz.filter(t=>t.businessId===bid);
+      html+=`<div style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px">
+          <div style="width:6px;height:6px;border-radius:50%;background:${col}"></div>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--t2)">${biz?.name||'Business'}</span>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px 12px">
+          ${sortTasks(bTasks).map(t=>taskHtml(t)).join('')}
+        </div>
+      </div>`;
+    });
+  }
+
+  el.innerHTML=html;
+}
+
+function taskHtml(t){
+  return `<div class="task-item${t.done?' faded':''}">
+    <div class="task-check${t.done?' on':''}" onclick="toggleTask('${t.id}')"></div>
+    <span class="task-text${t.done?' struck':''}" onclick="toggleTask('${t.id}')">${t.text}</span>
+    <button class="task-del" onclick="delTask('${t.id}')">✕</button>
+  </div>`;
+}
+
+// ─── BUSINESS TAB ────────────────────────────────
+function renderBizTab(){
+  const el=document.getElementById('biz-list');
+  if(!businesses.length){
+    el.innerHTML='<div class="empty">No businesses yet. Go to Overview and hit "+ Add".</div>';
+    return;
+  }
+  el.innerHTML=businesses.map(b=>{
+    const goals=bizGoals.filter(g=>g.businessId===b.id);
+    const bTasks=tasks.filter(t=>t.businessId===b.id);
+    const r=bizRev(b.id), e=bizExp(b.id), n=r-e;
+    const sortedTasks=[...bTasks.filter(t=>!t.done),...bTasks.filter(t=>t.done)];
+    const goalsHtml=goals.length?goals.map(g=>bizGoalHtml(g,b)).join(''):'<div class="empty-sm">No goals for this business.</div>';
+    const tasksHtml=sortedTasks.length?sortedTasks.map(t=>taskHtml(t)).join(''):'<div class="empty-sm">No daily tasks for this business.</div>';
+
+    return `<div class="biz-card">
+      <div class="biz-card-hdr" onclick="toggleBiz('${b.id}')">
+        <div class="biz-dot" style="background:${b.color||'#4ade80'}"></div>
+        <span class="biz-name">${b.name}</span>
+        <span class="biz-meta">${fmt(r)} rev · ${fmt(e)} exp · ${goals.length} goal${goals.length!==1?'s':''}</span>
+        <div class="biz-hdr-acts" onclick="event.stopPropagation()">
+          <button class="ghost" onclick="openModal('addBizGoal','${b.id}')">+ Goal</button>
+          <button class="ghost" onclick="openModal('addBizTask','${b.id}')">+ Task</button>
+          <button class="ghost" style="color:var(--red)" onclick="delBiz('${b.id}')">✕</button>
+        </div>
+        <span style="font-family:var(--mono);color:var(--t3);font-size:10px;margin-left:4px">${b._open?'▴':'▾'}</span>
+      </div>
+      <div class="biz-body" ${b._open?'':'style="display:none"'}>
+        <div class="biz-section">
+          <div class="biz-sec-hdr">
+            <span class="biz-sec-label">Long-term Goals</span>
+            <div style="display:flex;gap:6px">
+              <button class="ghost" onclick="openModal('logIncome',null,'${b.id}')">+ Income</button>
+              <button class="ghost" onclick="openModal('logExpense',null,'${b.id}')">− Expense</button>
+              <button class="primary sm" onclick="openModal('addBizGoal','${b.id}')">+ Goal</button>
+            </div>
+          </div>
+          ${goalsHtml}
+        </div>
+        <div class="biz-section">
+          <div class="biz-sec-hdr">
+            <span class="biz-sec-label">Daily Tasks</span>
+            <button class="primary sm" onclick="openModal('addBizTask','${b.id}')">+ Task</button>
+          </div>
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:4px 12px">
+            ${tasksHtml}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function bizGoalHtml(g, b){
+  const subs=g.subtasks||[];
+  const doneCount=subs.filter(s=>s.done).length;
+  const r=goalRev(g.id), e=goalExp(g.id), n=r-e;
+  const subsHtml=subs.map((s,i)=>`
+    <div class="sub-row">
+      <div class="sub-ck${s.done?' on':''}" onclick="toggleSub('${g.id}',${i})"></div>
+      <span class="sub-txt${s.done?' done':''}" onclick="toggleSub('${g.id}',${i})">${s.text}</span>
+      <button class="sub-del" onclick="delSub('${g.id}',${i})">✕</button>
+    </div>`).join('');
+
+  return `<div class="bg-card">
+    <div class="bg-row">
+      <div class="bg-check${g.done?' on':''}" onclick="toggleBizGoal('${g.id}')"></div>
+      <span class="bg-name${g.done?' done':''}">
+        ${g.name}
+        ${subs.length?`<span style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-left:6px">${doneCount}/${subs.length}</span>`:''}
+      </span>
+      <span class="bg-money">
+        <span class="tg">${fmt(r)}</span>
+        <span style="color:var(--t3);margin:0 3px">/</span>
+        <span class="tr">${fmt(e)}</span>
+        <span style="color:${n>=0?'var(--green)':'var(--red)'};margin-left:4px">(${n>=0?'+':''}${fmt(n)})</span>
+      </span>
+      <button class="bg-caret${g._open?' open':''}" onclick="toggleBizGoalOpen('${g.id}')">▾</button>
+      <button class="bg-del" onclick="delBizGoal('${g.id}')">✕</button>
+    </div>
+    <div class="bg-body" ${g._open?'':'style="display:none"'}>
+      ${subsHtml}
+      <div class="add-sub-row">
+        <input type="text" placeholder="Add sub-task…" id="si-${g.id}" onkeydown="if(event.key==='Enter')addSub('${g.id}')">
+        <button class="primary sm" onclick="addSub('${g.id}')">Add</button>
+      </div>
+      <div class="tx-footer">
+        <button class="txbtn inc" onclick="openModal('logIncome','${g.id}')">+ Income</button>
+        <button class="txbtn xp" onclick="openModal('logExpense',null,'${b.id}','${g.id}')">− Expense</button>
+        <button class="txbtn" onclick="openGoalHistory('${g.id}')">History</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── TAB SWITCH ─────────────────────────────────
+function switchTaskTab(tab){
+  currentTab=tab;
+  document.getElementById('ttab-d').classList.toggle('active',tab==='daily');
+  document.getElementById('ttab-b').classList.toggle('active',tab==='business');
+  document.getElementById('pane-daily').style.display=tab==='daily'?'':'none';
+  document.getElementById('pane-biz').style.display=tab==='business'?'':'none';
+  document.getElementById('tasks-hdr-btn').innerHTML=
+    tab==='daily'
+      ?'<button class="primary sm" onclick="openModal(\'addTask\')">+ Add task</button>'
+      :'<button class="primary sm" onclick="openModal(\'addBusiness\')">+ Add business</button>';
+}
+
+// ─── FINANCIALS ─────────────────────────────────
+function renderFinancials(){
+  const tbody=document.getElementById('finBody');
+  if(!businesses.length){
+    tbody.innerHTML='<tr><td colspan="5"><div class="empty">No businesses yet.</div></td></tr>';
+    document.getElementById('finFoot').innerHTML='';
+    return;
+  }
+  let rows='';
+  businesses.forEach(b=>{
+    const r=bizRev(b.id), e=bizExp(b.id), n=r-e;
+    rows+=`<tr style="background:var(--bg3)">
+      <td style="font-weight:600">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:6px;height:6px;border-radius:50%;background:${b.color||'#4ade80'}"></div>
+          ${b.name}
+        </div>
+      </td>
+      <td class="mono tg">${fmt(r)}</td>
+      <td class="mono tr">${fmt(e)}</td>
+      <td class="mono ${n>=0?'tg':'tr'}">${n>=0?'+':''}${fmt(n)}</td>
+      <td>
+        <button class="act-btn" onclick="openModal('logIncome',null,'${b.id}')">+ Income</button>
+        <button class="act-btn" onclick="openModal('logExpense',null,'${b.id}')">− Expense</button>
+      </td>
+    </tr>`;
+    bizGoals.filter(g=>g.businessId===b.id).forEach(g=>{
+      const gr=goalRev(g.id), ge=goalExp(g.id), gn=gr-ge;
+      rows+=`<tr>
+        <td style="padding-left:32px;color:var(--t2)">↳ ${g.name}</td>
+        <td class="mono tg">${fmt(gr)}</td>
+        <td class="mono tr">${fmt(ge)}</td>
+        <td class="mono ${gn>=0?'tg':'tr'}">${gn>=0?'+':''}${fmt(gn)}</td>
+        <td><button class="act-btn" onclick="openModal('logIncome','${g.id}')">+ Income</button></td>
+      </tr>`;
+    });
+  });
+  tbody.innerHTML=rows;
+  const tr=totRev(), te=totExp(), tn=netP();
+  document.getElementById('finFoot').innerHTML=`<tr>
+    <td style="font-weight:600;font-family:var(--mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--t3)">Total</td>
+    <td class="mono tg" style="font-weight:600">${fmt(tr)}</td>
+    <td class="mono tr" style="font-weight:600">${fmt(te)}</td>
+    <td class="mono ${tn>=0?'tg':'tr'}" style="font-weight:600">${tn>=0?'+':''}${fmt(tn)}</td>
+    <td></td>
+  </tr>`;
+}
+
+function renderTxList(){
+  const el=document.getElementById('txList');
+  if(!txns.length){el.innerHTML='<div class="empty">No transactions yet.</div>';return;}
+  const sorted=[...txns].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  el.innerHTML=sorted.map(t=>{
+    const biz=businesses.find(b=>b.id===t.businessId);
+    const g=bizGoals.find(x=>x.id===t.bizGoalId);
+    const inc=t.type==='income';
+    return `<div class="tx-item">
+      <div class="tx-dot" style="background:${inc?'var(--green)':'var(--red)'}"></div>
+      <div style="flex:1">
+        <div class="tx-label">${t.desc||(inc?'Income':'Expense')}</div>
+        <div class="tx-sub">${biz?biz.name:'—'}${g?' · '+g.name:''} · ${fmtD(t.date)}</div>
+      </div>
+      <div class="tx-amt ${inc?'tg':'tr'}">${inc?'+':'−'}${fmt(t.amount)}</div>
+      <button class="act-btn del" onclick="delTxn('${t.id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function renderExpenses(){
+  const tbody=document.getElementById('expBody');
+  if(!expenses.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty">No expenses yet.</div></td></tr>';return;}
+  const sorted=[...expenses].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const cc={tools:'ct',ads:'ca',software:'cs',other:'co'};
+  tbody.innerHTML=sorted.map(e=>{
+    const biz=businesses.find(b=>b.id===e.businessId);
+    const g=bizGoals.find(x=>x.id===e.bizGoalId);
+    return `<tr>
+      <td>${e.desc||'—'}</td>
+      <td><span class="exp-cat ${cc[e.category]||'co'}">${e.category||'other'}</span></td>
+      <td class="tm mono">${biz?biz.name:'—'}</td>
+      <td class="tm mono">${g?g.name:'—'}</td>
+      <td class="tm mono">${fmtD(e.date)}</td>
+      <td class="mono tr">${fmt(e.amount)}</td>
+      <td><button class="act-btn del" onclick="delExp('${e.id}')">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderExpStats(){
+  const el=document.getElementById('expStats');
+  const cats=['tools','ads','software','other'];
+  el.innerHTML=cats.map(c=>{
+    const t=expenses.filter(e=>e.category===c).reduce((s,e)=>s+(+e.amount||0),0);
+    return `<div class="stat-card">
+      <div class="stat-label">${c}</div>
+      <div class="stat-value">${fmt(t)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── TASK ACTIONS ────────────────────────────────
+async function toggleTask(id){
+  const t=tasks.find(x=>x.id===id); if(!t)return;
+  try{await window._db.update('tasks',id,{done:!t.done})}catch(e){}
+}
+async function delTask(id){
+  try{await window._db.del('tasks',id)}catch(e){}
+}
+async function quickAddTask(){
+  const inp=document.getElementById('home-task-input');
+  const text=inp?.value.trim();
+  if(!text) return;
+  try{
+    await window._db.add('tasks',{text,done:false});
+    inp.value='';
+    toast('Task added ✓');
+  }catch(e){toast('Error')}
+}
+
+// ─── BIZ GOAL ACTIONS ───────────────────────────
+async function toggleBizGoal(id){
+  const g=bizGoals.find(x=>x.id===id); if(!g)return;
+  try{await window._db.update('bizGoals',id,{done:!g.done})}catch(e){}
+}
+async function toggleBizGoalOpen(id){
+  const g=bizGoals.find(x=>x.id===id); if(!g)return;
+  try{await window._db.update('bizGoals',id,{_open:!g._open})}catch(e){}
+}
+async function toggleSub(gid,idx){
+  const g=bizGoals.find(x=>x.id===gid); if(!g)return;
+  const subs=[...(g.subtasks||[])];
+  subs[idx]={...subs[idx],done:!subs[idx].done};
+  try{await window._db.update('bizGoals',gid,{subtasks:subs})}catch(e){}
+}
+async function addSub(gid){
+  const inp=document.getElementById('si-'+gid);
+  const text=inp?.value.trim(); if(!text)return;
+  const g=bizGoals.find(x=>x.id===gid); if(!g)return;
+  const subs=[...(g.subtasks||[]),{text,done:false}];
+  try{await window._db.update('bizGoals',gid,{subtasks:subs});inp.value='';}catch(e){}
+}
+async function delSub(gid,idx){
+  const g=bizGoals.find(x=>x.id===gid); if(!g)return;
+  const subs=(g.subtasks||[]).filter((_,i)=>i!==idx);
+  try{await window._db.update('bizGoals',gid,{subtasks:subs})}catch(e){}
+}
+async function delBizGoal(id){
+  if(!confirm('Delete this goal?'))return;
+  try{await window._db.del('bizGoals',id);toast('Goal deleted')}catch(e){}
+}
+
+// ─── BIZ ACTIONS ────────────────────────────────
+async function toggleBiz(id){
+  const b=businesses.find(x=>x.id===id); if(!b)return;
+  try{await window._db.update('businesses',id,{_open:!b._open})}catch(e){}
+}
+async function delBiz(id){
+  const gc=bizGoals.filter(g=>g.businessId===id).length;
+  const tc=tasks.filter(t=>t.businessId===id).length;
+  if(!confirm(`Delete this business and its ${gc} goal(s) and ${tc} task(s)?`))return;
+  try{
+    await window._db.del('businesses',id);
+    for(const g of bizGoals.filter(g=>g.businessId===id)) await window._db.del('bizGoals',g.id);
+    for(const t of tasks.filter(t=>t.businessId===id)) await window._db.del('tasks',t.id);
+    toast('Business deleted');
+  }catch(e){toast('Error')}
+}
+async function delTxn(id){ try{await window._db.del('txns',id)}catch(e){} }
+async function delExp(id){ try{await window._db.del('expenses',id)}catch(e){} }
+
+// ─── GOAL HISTORY ────────────────────────────────
+function openGoalHistory(gid){
+  const g=bizGoals.find(x=>x.id===gid);
+  const r=goalRev(gid), e=goalExp(gid), n=r-e;
+  const items=[
+    ...txns.filter(t=>t.bizGoalId===gid).map(t=>({...t,_k:'inc'})),
+    ...expenses.filter(x=>x.bizGoalId===gid).map(x=>({...x,_k:'exp'}))
+  ].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+
+  const box=document.getElementById('modalBox');
+  box.innerHTML=`<h2>${g?.name||'Goal'}</h2>
+    <div style="display:flex;gap:24px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+      <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);margin-bottom:4px">Revenue</div><div style="font-family:var(--mono);font-size:18px;font-weight:500;color:var(--green)">${fmt(r)}</div></div>
+      <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);margin-bottom:4px">Expenses</div><div style="font-family:var(--mono);font-size:18px;font-weight:500;color:var(--red)">${fmt(e)}</div></div>
+      <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);margin-bottom:4px">Net</div><div style="font-family:var(--mono);font-size:18px;font-weight:500;color:${n>=0?'var(--green)':'var(--red)'}">${fmt(n)}</div></div>
+    </div>
+    <div>
+      ${items.length?items.map(item=>{const inc=item._k==='inc';return`<div class="tx-item">
+        <div class="tx-dot" style="background:${inc?'var(--green)':'var(--red)'}"></div>
+        <div style="flex:1"><div class="tx-label">${item.desc||'—'}</div><div class="tx-sub">${fmtD(item.date)}</div></div>
+        <div class="tx-amt ${inc?'tg':'tr'}">${inc?'+':'−'}${fmt(item.amount)}</div>
+      </div>`}).join(''):'<div class="empty">No transactions yet.</div>'}
+    </div>
+    <div class="modal-footer">
+      <button class="secondary" onclick="closeModal()">Close</button>
+      <button class="primary" onclick="closeModal();setTimeout(()=>openModal('logIncome','${gid}'),60)">+ Income</button>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+// ─── MODALS ─────────────────────────────────────
+function openModal(type, bizGoalId, bizId, alsoGoalId){
+  const box=document.getElementById('modalBox');
+
+  if(type==='addTask'){
+    box.innerHTML=`<h2>New task</h2>
+      <div class="fr"><label>Task</label><input type="text" id="m-t" placeholder="e.g. Reply to emails" onkeydown="if(event.key==='Enter')saveTask()"></div>
+      <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveTask()">Add task</button></div>`;
+  }
+  else if(type==='addBizTask'){
+    const biz=businesses.find(b=>b.id===bizId);
+    box.innerHTML=`<h2>New task — ${biz?.name||'Business'}</h2>
+      <div class="fr"><label>Task</label><input type="text" id="m-t" placeholder="e.g. Post on Instagram" onkeydown="if(event.key==='Enter')saveBizTask('${bizId}')"></div>
+      <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveBizTask('${bizId}')">Add</button></div>`;
+  }
+  else if(type==='addBusiness'){
+    _selColor=COLORS[businesses.length%COLORS.length];
+    box.innerHTML=`<h2>New business</h2>
+      <div class="fr"><label>Name</label><input type="text" id="m-t" placeholder="e.g. My SaaS" onkeydown="if(event.key==='Enter')saveBusiness()"></div>
+      <div class="fr"><label>Color</label><div class="swatches">${COLORS.map(c=>`<div class="swatch${c===_selColor?' sel':''}" style="background:${c}" onclick="pickColor('${c}',this)"></div>`).join('')}</div></div>
+      <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveBusiness()">Create</button></div>`;
+  }
+  else if(type==='addBizGoal'){
+    const biz=businesses.find(b=>b.id===bizId);
+    box.innerHTML=`<h2>New goal — ${biz?.name||'Business'}</h2>
+      <div class="fr"><label>Goal name</label><input type="text" id="m-t" placeholder="e.g. Reach 1,000 customers" onkeydown="if(event.key==='Enter')saveBizGoal('${bizId}')"></div>
+      <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveBizGoal('${bizId}')">Add goal</button></div>`;
+  }
+  else if(type==='logIncome'){
+    const preGoal=bizGoalId||'';
+    const goal=bizGoals.find(g=>g.id===preGoal);
+    const preBiz=bizId||(goal?.businessId)||'';
+    const bizOpts=businesses.map(b=>`<option value="${b.id}" ${b.id===preBiz?'selected':''}>${b.name}</option>`).join('');
+    const goalOpts=bizGoals.filter(g=>!preBiz||g.businessId===preBiz).map(g=>`<option value="${g.id}" ${g.id===preGoal?'selected':''}>${g.name}</option>`).join('');
+    box.innerHTML=`<h2>Log income${goal?' — '+goal.name:''}</h2>
+      <div class="fr"><label>Description</label><input type="text" id="m-desc" placeholder="e.g. Client payment"></div>
+      <div class="g2">
+        <div class="fr"><label>Amount ($)</label><input type="number" id="m-amt" placeholder="0.00" min="0" step="0.01"></div>
+        <div class="fr"><label>Date</label><input type="date" id="m-date" value="${today()}"></div>
+      </div>
+      <div class="g2">
+        <div class="fr"><label>Business</label><select id="m-biz"><option value="">— None —</option>${bizOpts}</select></div>
+        <div class="fr"><label>Goal (optional)</label><select id="m-goal"><option value="">— None —</option>${goalOpts}</select></div>
+      </div>
+      <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveIncome()">Log income</button></div>`;
+  }
+  else if(type==='logExpense'){
+    const preBiz=bizId||'';
+    const preGoal=alsoGoalId||'';
+    const bizOpts=businesses.map(b=>`<option value="${b.id}" ${b.id===preBiz?'selected':''}>${b.name}</option>`).join('');
+    const goalOpts=bizGoals.filter(g=>!preBiz||g.businessId===preBiz).map(g=>`<option value="${g.id}" ${g.id===preGoal?'selected':''}>${g.name}</option>`).join('');
+    box.innerHTML=`<h2>Log expense</h2>
+      <div class="fr"><label>Description</label><input type="text" id="m-desc" placeholder="e.g. Facebook ads"></div>
+      <div class="g2">
+        <div class="fr"><label>Amount ($)</label><input type="number" id="m-amt" placeholder="0.00" min="0" step="0.01"></div>
+        <div class="fr"><label>Date</label><input type="date" id="m-date" value="${today()}"></div>
+      </div>
+      <div class="g2">
+        <div class="fr"><label>Category</label><select id="m-cat"><option value="tools">Tools</option><option value="ads">Ads</option><option value="software">Software</option><option value="other">Other</option></select></div>
+        <div class="fr"><label>Business</label><select id="m-biz"><option value="">— None —</option>${bizOpts}</select></div>
+      </div>
+      <div class="fr"><label>Goal (optional)</label><select id="m-goal"><option value="">— None —</option>${goalOpts}</select></div>
+      <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveExpense()">Log expense</button></div>`;
+  }
+
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('modalBox').querySelector('input,select')?.focus(),50);
+}
+
+function pickColor(c,el){
+  _selColor=c;
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('sel'));
+  el.classList.add('sel');
+}
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('open');
+  _busy=false;
+}
+
+// ─── SAVES ──────────────────────────────────────
+function lock(label){
+  if(_busy)return false;
+  _busy=true;
+  const b=document.getElementById('m-btn');
+  if(b){b.disabled=true;b.textContent=label||'Saving…'}
+  return true;
+}
+function unlock(label){
+  _busy=false;
+  const b=document.getElementById('m-btn');
+  if(b){b.disabled=false;b.textContent=label||'Save'}
+}
+
+async function saveTask(){
+  if(!lock('Adding…'))return;
+  const text=document.getElementById('m-t')?.value.trim();
+  if(!text){unlock('Add task');return}
+  try{await window._db.add('tasks',{text,done:false});closeModal();toast('Task added ✓')}
+  catch(e){toast('Error');unlock('Add task')}
+}
+async function saveBizTask(bizId){
+  if(!lock('Adding…'))return;
+  const text=document.getElementById('m-t')?.value.trim();
+  if(!text){unlock('Add task');return}
+  try{await window._db.add('tasks',{text,done:false,businessId:bizId});closeModal();toast('Task added ✓')}
+  catch(e){toast('Error');unlock('Add task')}
+}
+async function saveBusiness(){
+  if(!lock('Creating…'))return;
+  const name=document.getElementById('m-t')?.value.trim();
+  if(!name){unlock('Create');return}
+  try{await window._db.add('businesses',{name,color:_selColor,_open:true});closeModal();toast('Business created ✓')}
+  catch(e){toast('Error');unlock('Create')}
+}
+async function saveBizGoal(bizId){
+  if(!lock('Adding…'))return;
+  const name=document.getElementById('m-t')?.value.trim();
+  if(!name){unlock('Add goal');return}
+  try{await window._db.add('bizGoals',{name,businessId:bizId,done:false,subtasks:[],_open:false});closeModal();toast('Goal added ✓')}
+  catch(e){toast('Error');unlock('Add goal')}
+}
+async function saveIncome(){
+  if(!lock('Saving…'))return;
+  const amt=parseFloat(document.getElementById('m-amt')?.value);
+  if(!amt||amt<=0){unlock('Log income');return}
+  try{
+    const bid=document.getElementById('m-biz')?.value||'';
+    const gid=document.getElementById('m-goal')?.value||'';
+    const desc=document.getElementById('m-desc')?.value.trim()||'';
+    const date=document.getElementById('m-date')?.value||today();
+    await window._db.add('txns',{type:'income',desc,amount:amt,date,businessId:bid,bizGoalId:gid});
+    closeModal();toast('Income logged ✓');
+  }catch(e){toast('Error');unlock('Log income')}
+}
+async function saveExpense(){
+  if(!lock('Saving…'))return;
+  const amt=parseFloat(document.getElementById('m-amt')?.value);
+  if(!amt||amt<=0){unlock('Log expense');return}
+  try{
+    const bid=document.getElementById('m-biz')?.value||'';
+    const gid=document.getElementById('m-goal')?.value||'';
+    const desc=document.getElementById('m-desc')?.value.trim()||'';
+    const date=document.getElementById('m-date')?.value||today();
+    const cat=document.getElementById('m-cat')?.value||'other';
+    await window._db.add('expenses',{desc,amount:amt,date,category:cat,businessId:bid,bizGoalId:gid});
+    await window._db.add('txns',{type:'expense',desc,amount:amt,date,businessId:bid,bizGoalId:gid});
+    closeModal();toast('Expense logged ✓');
+  }catch(e){toast('Error');unlock('Log expense')}
+}
+
+// ─── NAV ────────────────────────────────────────
+function showPage(name, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(name==='tasks') switchTaskTab(currentTab);
+}
+
+// ─── TOAST ──────────────────────────────────────
+let _tt;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.classList.add('show');
+  clearTimeout(_tt);
+  _tt=setTimeout(()=>el.classList.remove('show'),2200);
+}
+
+// ─── GREETING ───────────────────────────────────
+(()=>{
+  const h=new Date().getHours();
+  document.getElementById('timeGreeting').textContent=h<12?'morning':h<17?'afternoon':'evening';
+  document.getElementById('todayDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+})();
+</script>
+</body>
+</html>
