@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Empire Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -11,14 +11,14 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
- const firebaseConfig = {
-  apiKey: "AIzaSyCMQMSeHWSHDVZnVFq5JknhQYEMQjzq6Uo",
-  authDomain: "productivity-1fc58.firebaseapp.com",
-  projectId: "productivity-1fc58",
-  storageBucket: "productivity-1fc58.firebasestorage.app",
-  messagingSenderId: "326423432805",
-  appId: "1:326423432805:web:96ba1d5ae84d556599808c"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyCMQMSeHWSHDVZnVFq5JknhQYEMQjzq6Uo",
+    authDomain: "productivity-1fc58.firebaseapp.com",
+    projectId: "productivity-1fc58",
+    storageBucket: "productivity-1fc58.firebasestorage.app",
+    messagingSenderId: "326423432805",
+    appId: "1:326423432805:web:96ba1d5ae84d556599808c"
+  };
 
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
@@ -50,7 +50,6 @@
   --t2:        #888888;
   --t3:        #555555;
   --t4:        #3a3a3a;
-
   --green:     #4ade80;
   --green-dim: #1a3d28;
   --red:       #f87171;
@@ -58,12 +57,9 @@
   --amber:     #fbbf24;
   --blue:      #60a5fa;
   --blue-dim:  #1a2840;
-
   --accent:    #e8e8e8;
-
   --mono: 'IBM Plex Mono', monospace;
   --sans: 'Syne', sans-serif;
-
   --sidebar: 220px;
   --r: 6px;
 }
@@ -75,9 +71,9 @@ body {
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
 }
 
-/* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 4px; height: 4px }
 ::-webkit-scrollbar-track { background: transparent }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px }
@@ -150,12 +146,7 @@ body {
   transition: color 0.12s, background 0.12s;
   position: relative;
 }
-.nav-item .ni-icon {
-  font-size: 14px;
-  width: 16px;
-  text-align: center;
-  flex-shrink: 0;
-}
+.nav-item .ni-icon { font-size: 14px; width: 16px; text-align: center; flex-shrink: 0 }
 .nav-item:hover { background: var(--bg3); color: var(--text) }
 .nav-item.active { background: var(--bg4); color: var(--text) }
 .nav-item.active::before {
@@ -188,7 +179,7 @@ body {
   margin-left: var(--sidebar);
   flex: 1;
   padding: 32px 36px;
-  max-width: 1100px;
+  min-width: 0;
 }
 
 .page { display: none }
@@ -311,7 +302,7 @@ body {
 /* ── CHARTS ── */
 .charts-row {
   display: grid;
-  grid-template-columns: 1fr 240px;
+  grid-template-columns: 1fr 220px 220px;
   gap: 12px;
   margin-bottom: 20px;
 }
@@ -320,6 +311,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--r);
   padding: 18px 20px;
+  min-width: 0;
 }
 .card-title {
   font-family: var(--mono);
@@ -329,16 +321,15 @@ body {
   color: var(--t3);
   margin-bottom: 14px;
 }
-.chart-wrap { position: relative; height: 160px }
-.pie-wrap   { position: relative; height: 130px; margin-bottom: 12px }
-
+.chart-wrap { position: relative; height: 170px }
+.pie-wrap   { position: relative; height: 120px; margin-bottom: 10px }
 .pie-legend { display: flex; flex-direction: column; gap: 5px }
 .pie-li {
   display: flex;
   align-items: center;
   gap: 8px;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 10px;
   color: var(--t2);
 }
 .pie-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0 }
@@ -347,7 +338,7 @@ body {
 /* ── HOME GRID ── */
 .home-grid {
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: 1fr 340px;
   gap: 12px;
   margin-bottom: 20px;
 }
@@ -367,7 +358,7 @@ body {
   color: var(--t3);
 }
 
-/* ── TASKS (HOME) ── */
+/* ── TASKS PANEL ── */
 .tasks-panel {
   background: var(--bg2);
   border: 1px solid var(--border);
@@ -376,15 +367,31 @@ body {
   display: flex;
   flex-direction: column;
 }
-.tasks-panel-hdr {
+
+/* Task frequency tabs */
+.freq-tabs {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 16px;
   border-bottom: 1px solid var(--border);
 }
-.tasks-panel-hdr .sec-label { margin-bottom: 0 }
-.tasks-inner { flex: 1; overflow-y: auto; max-height: 280px; padding: 10px 12px }
+.freq-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px 6px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t3);
+  cursor: pointer;
+  margin-bottom: -1px;
+  transition: color 0.12s;
+}
+.freq-tab:hover { color: var(--t2) }
+.freq-tab.active { color: var(--text); border-bottom-color: var(--text) }
+
+.tasks-inner { flex: 1; overflow-y: auto; max-height: 260px; padding: 6px 12px }
 .quick-add-row {
   display: flex;
   gap: 6px;
@@ -401,9 +408,9 @@ body {
   border-radius: var(--r);
   padding: 12px 14px;
   display: grid;
-  grid-template-columns: 8px 1fr repeat(3, 80px);
+  grid-template-columns: 8px 1fr repeat(3, 72px);
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 .biz-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0 }
 .biz-name-cell .name { font-size: 13px; font-weight: 600 }
@@ -416,13 +423,30 @@ body {
 .task-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 8px 0;
   border-bottom: 1px solid var(--border);
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, background 0.1s;
+  border-radius: 4px;
+  cursor: default;
 }
 .task-item:last-child { border-bottom: none }
-.task-item.faded { opacity: 0.35 }
+.task-item.faded { opacity: 0.38 }
+.task-item.drag-over { background: var(--bg3); outline: 1px dashed var(--border2); }
+.task-item.dragging { opacity: 0.3 }
+
+.drag-handle {
+  cursor: grab;
+  color: var(--t4);
+  font-size: 14px;
+  padding: 0 2px;
+  flex-shrink: 0;
+  transition: color 0.12s;
+  user-select: none;
+  letter-spacing: -1px;
+}
+.drag-handle:hover { color: var(--t2) }
+.drag-handle:active { cursor: grabbing }
 
 .task-check {
   width: 16px; height: 16px;
@@ -450,6 +474,8 @@ body {
   font-size: 13px;
   cursor: pointer;
   color: var(--text);
+  min-width: 0;
+  word-break: break-word;
 }
 .task-text.struck { text-decoration: line-through; color: var(--t3) }
 .task-del {
@@ -461,6 +487,7 @@ body {
   opacity: 0;
   transition: opacity 0.12s;
   font-family: var(--mono);
+  flex-shrink: 0;
 }
 .task-item:hover .task-del { opacity: 1 }
 .task-del:hover { color: var(--red) }
@@ -489,7 +516,7 @@ body {
 .tab-btn:hover { color: var(--t2) }
 .tab-btn.active { color: var(--text); border-bottom-color: var(--text) }
 
-/* ── BIZ CARDS (TASK PAGE) ── */
+/* ── BIZ CARDS ── */
 .biz-card {
   background: var(--bg2);
   border: 1px solid var(--border);
@@ -507,14 +534,10 @@ body {
   transition: background 0.12s;
 }
 .biz-card-hdr:hover { background: var(--bg3) }
-.biz-card-hdr .biz-dot { flex-shrink: 0 }
 .biz-card-hdr .biz-name { font-size: 14px; font-weight: 600; flex: 1 }
 .biz-card-hdr .biz-meta { font-family: var(--mono); font-size: 10px; color: var(--t3) }
 .biz-hdr-acts { display: flex; gap: 4px; align-items: center }
-.biz-body {
-  border-top: 1px solid var(--border);
-  background: var(--bg);
-}
+.biz-body { border-top: 1px solid var(--border); background: var(--bg) }
 .biz-section { padding: 14px 16px; border-bottom: 1px solid var(--border) }
 .biz-section:last-child { border-bottom: none }
 .biz-sec-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px }
@@ -545,6 +568,7 @@ body {
   cursor: pointer;
   transition: all 0.12s;
 }
+.bg-check:hover { border-color: var(--green) }
 .bg-check.on { background: var(--green); border-color: var(--green) }
 .bg-check.on::after {
   content: '';
@@ -554,18 +578,19 @@ body {
   transform: rotate(45deg) translateY(-1px);
   display: block;
 }
-.bg-name { flex: 1; font-size: 13px; font-weight: 500 }
+.bg-name { flex: 1; font-size: 13px; font-weight: 500; min-width: 0 }
 .bg-name.done { text-decoration: line-through; color: var(--t3); font-weight: 400 }
-.bg-money { font-family: var(--mono); font-size: 11px; color: var(--t2); flex-shrink: 0 }
+.bg-money { font-family: var(--mono); font-size: 10px; color: var(--t2); flex-shrink: 0; text-align: right }
 .bg-caret {
   background: none; border: none;
   cursor: pointer;
   color: var(--t3);
   font-size: 10px;
-  padding: 0 2px;
+  padding: 2px 4px;
   transition: transform 0.2s;
   line-height: 1;
   font-family: var(--mono);
+  flex-shrink: 0;
 }
 .bg-caret.open { transform: rotate(180deg) }
 .bg-del {
@@ -577,6 +602,7 @@ body {
   opacity: 0;
   transition: opacity 0.12s;
   font-family: var(--mono);
+  flex-shrink: 0;
 }
 .bg-row:hover .bg-del { opacity: 1 }
 .bg-del:hover { color: var(--red) }
@@ -613,7 +639,7 @@ body {
 .add-sub-row { display: flex; gap: 6px; padding: 6px 12px 8px 38px; border-top: 1px solid var(--border) }
 .add-sub-row input { flex: 1; font-size: 12px }
 
-.tx-footer { display: flex; gap: 6px; padding: 8px 12px 10px 38px; border-top: 1px solid var(--border) }
+.tx-footer { display: flex; gap: 6px; padding: 8px 12px 10px 38px; border-top: 1px solid var(--border); flex-wrap: wrap }
 .txbtn {
   font-family: var(--mono);
   font-size: 10px;
@@ -631,7 +657,7 @@ body {
 .txbtn.xp { border-color: #3d1a1a; color: var(--red) }
 .txbtn.xp:hover { background: var(--red-dim) }
 
-/* ── FINANCIALS ── */
+/* ── FINANCIALS TABLE ── */
 .table-card {
   background: var(--bg2);
   border: 1px solid var(--border);
@@ -650,6 +676,7 @@ thead th {
   color: var(--t3);
   border-bottom: 1px solid var(--border);
   background: var(--bg3);
+  white-space: nowrap;
 }
 tbody td { padding: 11px 16px; border-bottom: 1px solid var(--border); font-size: 13px }
 tbody tr:last-child td { border-bottom: none }
@@ -670,7 +697,7 @@ tfoot td { padding: 11px 16px; font-family: var(--mono); font-size: 12px; border
 .tx-item:last-child { border-bottom: none }
 .tx-item:hover { background: var(--bg3) }
 .tx-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0 }
-.tx-amt { font-family: var(--mono); font-size: 13px; font-weight: 500 }
+.tx-amt { font-family: var(--mono); font-size: 13px; font-weight: 500; white-space: nowrap }
 .tx-label { font-size: 13px }
 .tx-sub { font-family: var(--mono); font-size: 10px; color: var(--t3); margin-top: 1px }
 
@@ -682,6 +709,7 @@ tfoot td { padding: 11px 16px; font-family: var(--mono); font-size: 12px; border
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 .ct { background: var(--blue-dim); color: var(--blue) }
 .ca { background: #2a1a40; color: #c084fc }
@@ -720,6 +748,7 @@ button.primary {
   cursor: pointer;
   transition: opacity 0.12s;
   letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 button.primary:hover { opacity: 0.85 }
 button.primary:disabled { opacity: 0.4; cursor: not-allowed }
@@ -736,6 +765,7 @@ button.secondary {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.12s;
+  white-space: nowrap;
 }
 button.secondary:hover { background: var(--bg3); color: var(--text) }
 button.secondary.sm { padding: 6px 10px; font-size: 11px }
@@ -751,6 +781,7 @@ button.ghost {
   border-radius: 4px;
   transition: all 0.12s;
   font-family: var(--sans);
+  white-space: nowrap;
 }
 button.ghost:hover { background: var(--bg4); color: var(--text) }
 
@@ -764,6 +795,7 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
   padding: 3px 6px;
   border-radius: 4px;
   transition: all 0.12s;
+  white-space: nowrap;
 }
 .act-btn:hover { background: var(--bg4); color: var(--text) }
 .act-btn.del:hover { color: var(--red) }
@@ -778,6 +810,7 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(2px);
+  padding: 16px;
 }
 .modal-overlay.open { display: flex }
 .modal {
@@ -786,7 +819,7 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
   border-radius: 8px;
   padding: 26px 24px 20px;
   width: 420px;
-  max-width: 94vw;
+  max-width: 100%;
   max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 24px 60px rgba(0,0,0,0.6);
@@ -818,8 +851,8 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
 
 #toast {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 24px;
+  right: 24px;
   background: var(--text);
   color: var(--bg);
   padding: 9px 16px;
@@ -856,28 +889,111 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
 .swatch:hover { transform: scale(1.12) }
 .swatch.sel { border-color: var(--text); transform: scale(1.12) }
 
-.task-group-sep {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--t3);
-  padding: 10px 0 6px;
-  display: block;
+/* ── MOBILE BOTTOM NAV ── */
+.mobile-nav {
+  display: none;
 }
-.task-group-sep:first-child { padding-top: 0 }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .charts-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .charts-row .card:first-child {
+    grid-column: 1 / -1;
+  }
+  .home-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar { display: none }
+  .content {
+    margin-left: 0;
+    padding: 16px 16px 80px;
+  }
+  .stats-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .stats-row .stat-card:last-child {
+    grid-column: 1 / -1;
+  }
+  .stat-value { font-size: 20px }
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+  .home-grid { grid-template-columns: 1fr }
+  .ph { flex-direction: column; gap: 12px; align-items: flex-start }
+  .ph-actions { width: 100%; }
+  .biz-row {
+    grid-template-columns: 8px 1fr repeat(2, 64px);
+  }
+  .biz-row .biz-num:last-child { display: none }
+  table { display: block; overflow-x: auto }
+  .g2 { grid-template-columns: 1fr }
+  .tx-footer { padding-left: 12px }
+
+  .mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    z-index: 50;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .mob-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--t3);
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: color 0.12s;
+    padding: 8px 4px;
+    position: relative;
+  }
+  .mob-btn.active { color: var(--text) }
+  .mob-btn.active::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 8px; right: 8px;
+    height: 2px;
+    background: var(--text);
+    border-radius: 0 0 2px 2px;
+  }
+  .mob-icon { font-size: 16px; line-height: 1 }
+
+  #toast { bottom: 76px; right: 12px; left: 12px; text-align: center }
+}
+
+@media (max-width: 480px) {
+  .content { padding: 12px 12px 80px }
+  .stat-value { font-size: 17px }
+  .biz-row { grid-template-columns: 8px 1fr 72px }
+  .biz-row .biz-num:nth-child(4),
+  .biz-row .biz-num:last-child { display: none }
+}
 </style>
 </head>
 <body>
 
 <div class="shell">
-
   <aside class="sidebar">
     <div class="logo">
       <div class="logo-mark"></div>
       Empire
     </div>
-
     <div class="nav-section">Main</div>
     <button class="nav-item active" onclick="showPage('home',this)">
       <span class="ni-icon">▦</span> Overview
@@ -891,7 +1007,6 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
     <button class="nav-item" onclick="showPage('expenses',this)">
       <span class="ni-icon">◇</span> Expenses
     </button>
-
     <div class="sidebar-footer">
       <div class="status-dot" id="statusDot"></div>
       <span id="statusText">Connecting…</span>
@@ -899,9 +1014,7 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
   </aside>
 
   <main class="content">
-    <div class="cfg-notice" id="cfgNotice">
-      Firebase not configured — replace the firebaseConfig at the top of this file.
-    </div>
+    <div class="cfg-notice" id="cfgNotice">Firebase not configured — replace the firebaseConfig at the top.</div>
 
     <!-- ══ HOME ══ -->
     <div class="page active" id="page-home">
@@ -953,10 +1066,14 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
           <div class="pie-wrap"><canvas id="pieChart"></canvas></div>
           <div class="pie-legend" id="pieLegend"></div>
         </div>
+        <div class="card">
+          <div class="card-title">Profit by business</div>
+          <div class="pie-wrap"><canvas id="profitChart"></canvas></div>
+          <div class="pie-legend" id="profitLegend"></div>
+        </div>
       </div>
 
       <div class="home-grid">
-        <!-- Businesses -->
         <div>
           <div class="sec-hdr">
             <span class="sec-label">Businesses</span>
@@ -964,13 +1081,16 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
           </div>
           <div id="home-biz" class="biz-summary"></div>
         </div>
-
-        <!-- Daily Tasks (home panel) -->
         <div>
-          <div class="sec-hdr">
-            <span class="sec-label">Today's Tasks</span>
+          <div class="sec-hdr" style="margin-bottom:0">
+            <span class="sec-label">Tasks</span>
           </div>
           <div class="tasks-panel">
+            <div class="freq-tabs">
+              <button class="freq-tab active" id="ht-d" onclick="switchHomeFreq('daily')">Daily</button>
+              <button class="freq-tab" id="ht-w" onclick="switchHomeFreq('weekly')">Weekly</button>
+              <button class="freq-tab" id="ht-m" onclick="switchHomeFreq('monthly')">Monthly</button>
+            </div>
             <div class="tasks-inner" id="home-tasks"></div>
             <div class="quick-add-row">
               <input type="text" id="home-task-input" placeholder="Quick add task…" onkeydown="if(event.key==='Enter')quickAddTask()">
@@ -998,9 +1118,7 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
           <thead>
             <tr><th>Business / Goal</th><th>Revenue</th><th>Expenses</th><th>Net</th><th></th></tr>
           </thead>
-          <tbody id="finBody">
-            <tr><td colspan="5"><div class="empty">No businesses yet.</div></td></tr>
-          </tbody>
+          <tbody id="finBody"><tr><td colspan="5"><div class="empty">No businesses yet.</div></td></tr></tbody>
           <tfoot id="finFoot"></tfoot>
         </table>
       </div>
@@ -1045,6 +1163,22 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
   </main>
 </div>
 
+<!-- Mobile bottom nav -->
+<nav class="mobile-nav">
+  <button class="mob-btn active" id="mob-home" onclick="showPage('home',null,'mob-home')">
+    <span class="mob-icon">▦</span>Home
+  </button>
+  <button class="mob-btn" id="mob-financial" onclick="showPage('financial',null,'mob-financial')">
+    <span class="mob-icon">◈</span>Finance
+  </button>
+  <button class="mob-btn" id="mob-tasks" onclick="showPage('tasks',null,'mob-tasks')">
+    <span class="mob-icon">◎</span>Goals
+  </button>
+  <button class="mob-btn" id="mob-expenses" onclick="showPage('expenses',null,'mob-expenses')">
+    <span class="mob-icon">◇</span>Expenses
+  </button>
+</nav>
+
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
   <div class="modal" id="modalBox"></div>
 </div>
@@ -1059,15 +1193,32 @@ let txns       = [];
 let expenses   = [];
 let snapshots  = [];
 
-let lineChart, pieChart;
+let lineChart, pieChart, profitChart;
 let _busy = false;
 let currentTab = 'daily';
+let homeFreq   = 'daily';
+let _dragId    = null;
+let _selColor  = '#4ade80';
 
-const COLORS = ['#4ade80','#60a5fa','#f472b6','#fb923c','#a78bfa','#34d399','#fbbf24','#f87171'];
-let _selColor = COLORS[0];
+const COLORS = ['#4ade80','#60a5fa','#f472b6','#fb923c','#a78bfa','#34d399','#fbbf24','#f87171','#38bdf8','#fb7185'];
 
-const fmt  = n => '$'+(+(n||0)).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2});
-const fmtD = d => d ? new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+function randomColor() {
+  const usedColors = businesses.map(b => b.color);
+  const unused = COLORS.filter(c => !usedColors.includes(c));
+  if (unused.length) return unused[Math.floor(Math.random() * unused.length)];
+  // Generate random HSL if all preset colors used
+  const hue = Math.floor(Math.random() * 360);
+  return `hsl(${hue},65%,60%)`;
+}
+
+const fmt  = n => {
+  const v = +(n||0);
+  if (Math.abs(v) >= 1000000) return '$'+(v/1000000).toFixed(2)+'M';
+  if (Math.abs(v) >= 1000) return '$'+(v/1000).toFixed(1)+'k';
+  return '$'+v.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2});
+};
+const fmtFull = n => '$'+(+(n||0)).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2});
+const fmtD = d => d ? new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
 const today = () => new Date().toISOString().split('T')[0];
 
 // ─── AGGREGATES ─────────────────────────────────
@@ -1078,6 +1229,16 @@ const goalExp = id => expenses.filter(e=>e.bizGoalId===id).reduce((s,e)=>s+(+e.a
 const totRev  = () => txns.filter(t=>t.type==='income').reduce((s,t)=>s+(+t.amount||0),0);
 const totExp  = () => expenses.reduce((s,e)=>s+(+e.amount||0),0);
 const netP    = () => totRev()-totExp();
+
+// ─── TASK ORDERING ─────────────────────────────
+function taskOrder(t) {
+  if (t.order !== undefined && t.order !== null) return +t.order;
+  if (t.createdAt?.seconds) return t.createdAt.seconds * 1000;
+  return Date.now();
+}
+function sortedTasks(arr) {
+  return [...arr].sort((a,b) => taskOrder(a) - taskOrder(b));
+}
 
 // ─── BOOT ───────────────────────────────────────
 window.addEventListener('db-ready', () => {
@@ -1121,10 +1282,10 @@ function renderAll(){
 // ─── STATS ──────────────────────────────────────
 function renderStats(){
   const r=totRev(), e=totExp(), n=netP();
-  document.getElementById('s-rev').textContent=fmt(r);
-  document.getElementById('s-exp').textContent=fmt(e);
+  document.getElementById('s-rev').textContent=fmtFull(r);
+  document.getElementById('s-exp').textContent=fmtFull(e);
   const nel=document.getElementById('s-net');
-  nel.textContent=fmt(Math.abs(n));
+  nel.textContent=(n<0?'-':'')+fmtFull(Math.abs(n));
   nel.className='stat-value '+(n>=0?'green':'red');
   document.getElementById('s-net-sub').textContent=n>=0?'in profit':'in loss';
   document.getElementById('s-rev-sub').textContent=`${businesses.length} business${businesses.length!==1?'es':''}`;
@@ -1132,23 +1293,29 @@ function renderStats(){
 }
 
 function renderBanner(){
-  const n=netP(), pct=Math.min(100,Math.max(0,(n/1000000)*100));
+  const n=netP(), pct=n>0?Math.min(100,(n/1000000)*100):0;
   document.getElementById('goalBar').style.width=pct.toFixed(2)+'%';
   document.getElementById('goalPct').textContent=pct.toFixed(2)+'% there';
-  document.getElementById('goalNums').textContent=fmt(n)+' / $1,000,000';
+  document.getElementById('goalNums').textContent=fmtFull(n)+' / $1,000,000';
 }
 
 // ─── CHARTS ─────────────────────────────────────
 function initCharts(){
-  const gridColor='rgba(255,255,255,0.04)';
-  const tickColor='#555555';
+  const grid='rgba(255,255,255,0.04)';
+  const tick='#555555';
 
   lineChart=new Chart(document.getElementById('lineChart').getContext('2d'),{
     type:'line',
     data:{labels:[],datasets:[{
       label:'Net',data:[],
       borderColor:'#4ade80',
-      backgroundColor:'rgba(74,222,128,0.06)',
+      backgroundColor:(ctx)=>{
+        const canvas=ctx.chart.canvas;
+        const gradient=canvas.getContext('2d').createLinearGradient(0,0,0,canvas.height);
+        gradient.addColorStop(0,'rgba(74,222,128,0.15)');
+        gradient.addColorStop(1,'rgba(74,222,128,0)');
+        return gradient;
+      },
       borderWidth:1.5,
       pointBackgroundColor:'#4ade80',
       pointRadius:3,
@@ -1156,10 +1323,14 @@ function initCharts(){
     }]},
     options:{
       responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmt(c.parsed.y)},backgroundColor:'#1c1c1c',borderColor:'#333',borderWidth:1,titleColor:'#888',bodyColor:'#e8e8e8'}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtFull(c.parsed.y)},backgroundColor:'#1c1c1c',borderColor:'#333',borderWidth:1,titleColor:'#888',bodyColor:'#e8e8e8'}},
       scales:{
-        x:{grid:{color:gridColor},ticks:{color:tickColor,font:{size:10,family:'IBM Plex Mono'}}},
-        y:{grid:{color:gridColor},ticks:{color:tickColor,font:{size:10,family:'IBM Plex Mono'},callback:v=>fmt(v)}}
+        x:{grid:{color:grid},ticks:{color:tick,font:{size:10,family:'IBM Plex Mono'},maxRotation:0}},
+        y:{
+          grid:{color:grid},
+          ticks:{color:tick,font:{size:10,family:'IBM Plex Mono'},callback:v=>fmt(v)},
+          // Allow negative values — no min constraint
+        }
       }
     }
   });
@@ -1168,8 +1339,17 @@ function initCharts(){
     type:'doughnut',
     data:{labels:[],datasets:[{data:[],backgroundColor:[],borderWidth:0,hoverOffset:4}]},
     options:{
-      responsive:true,maintainAspectRatio:false,cutout:'68%',
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmt(c.parsed)},backgroundColor:'#1c1c1c',borderColor:'#333',borderWidth:1,bodyColor:'#e8e8e8'}}
+      responsive:true,maintainAspectRatio:false,cutout:'66%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtFull(c.parsed)},backgroundColor:'#1c1c1c',borderColor:'#333',borderWidth:1,bodyColor:'#e8e8e8'}}
+    }
+  });
+
+  profitChart=new Chart(document.getElementById('profitChart').getContext('2d'),{
+    type:'doughnut',
+    data:{labels:[],datasets:[{data:[],backgroundColor:[],borderWidth:0,hoverOffset:4}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,cutout:'66%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtFull(c.parsed)},backgroundColor:'#1c1c1c',borderColor:'#333',borderWidth:1,bodyColor:'#e8e8e8'}}
     }
   });
 }
@@ -1181,6 +1361,7 @@ function renderCharts(){
   lineChart.data.datasets[0].data=sorted.length?sorted.map(s=>+s.amount||0):[netP()];
   lineChart.update();
 
+  // Revenue pie
   const bwr=businesses.filter(b=>bizRev(b.id)>0);
   const lg=document.getElementById('pieLegend');
   if(bwr.length){
@@ -1189,23 +1370,43 @@ function renderCharts(){
     pieChart.data.datasets[0].backgroundColor=bwr.map(b=>b.color||'#4ade80');
     lg.innerHTML=bwr.map(b=>`<div class="pie-li">
       <span class="pie-dot" style="background:${b.color||'#4ade80'}"></span>
-      <span>${b.name}</span>
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px">${b.name}</span>
       <span class="pie-val">${fmt(bizRev(b.id))}</span>
     </div>`).join('');
   } else {
     pieChart.data.labels=['No data'];
     pieChart.data.datasets[0].data=[1];
     pieChart.data.datasets[0].backgroundColor=['#2a2a2a'];
-    lg.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--t3)">Log income to see breakdown.</div>';
+    lg.innerHTML='<div style="font-family:var(--mono);font-size:10px;color:var(--t3)">No revenue yet.</div>';
   }
   pieChart.update();
+
+  // Profit pie (net per business, only positive)
+  const bwp=businesses.filter(b=>(bizRev(b.id)-bizExp(b.id))>0);
+  const pl=document.getElementById('profitLegend');
+  if(bwp.length){
+    profitChart.data.labels=bwp.map(b=>b.name);
+    profitChart.data.datasets[0].data=bwp.map(b=>bizRev(b.id)-bizExp(b.id));
+    profitChart.data.datasets[0].backgroundColor=bwp.map(b=>b.color||'#4ade80');
+    pl.innerHTML=bwp.map(b=>`<div class="pie-li">
+      <span class="pie-dot" style="background:${b.color||'#4ade80'}"></span>
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px">${b.name}</span>
+      <span class="pie-val tg">${fmt(bizRev(b.id)-bizExp(b.id))}</span>
+    </div>`).join('');
+  } else {
+    profitChart.data.labels=['No profit'];
+    profitChart.data.datasets[0].data=[1];
+    profitChart.data.datasets[0].backgroundColor=['#2a2a2a'];
+    pl.innerHTML='<div style="font-family:var(--mono);font-size:10px;color:var(--t3)">No profit yet.</div>';
+  }
+  profitChart.update();
 }
 
 // ─── HOME PANELS ────────────────────────────────
 function renderHomeBiz(){
   const el=document.getElementById('home-biz');
   if(!businesses.length){
-    el.innerHTML='<div class="empty" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r)">No businesses yet.</div>';
+    el.innerHTML='<div class="empty" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r)">No businesses yet. Hit "+ Add" to create one.</div>';
     return;
   }
   el.innerHTML=businesses.map(b=>{
@@ -1224,15 +1425,111 @@ function renderHomeBiz(){
   }).join('');
 }
 
+function switchHomeFreq(freq) {
+  homeFreq = freq;
+  ['daily','weekly','monthly'].forEach(f=>{
+    document.getElementById('ht-'+f[0]).classList.toggle('active', f===freq);
+  });
+  renderHomeTasks();
+}
+
 function renderHomeTasks(){
   const el=document.getElementById('home-tasks');
-  const personal=tasks.filter(t=>!t.businessId);
-  const sortedTasks=[...personal.filter(t=>!t.done),...personal.filter(t=>t.done)];
-  if(!sortedTasks.length){
-    el.innerHTML='<div class="empty-sm" style="color:var(--t3)">No tasks — add one below.</div>';
+  const freqTasks=tasks.filter(t=>!t.businessId && (t.frequency||'daily')===homeFreq);
+  const st=sortedTasks(freqTasks);
+  if(!st.length){
+    el.innerHTML=`<div class="empty-sm">No ${homeFreq} tasks yet.</div>`;
     return;
   }
-  el.innerHTML=sortedTasks.map(t=>taskHtml(t)).join('');
+  el.innerHTML=st.map(t=>taskHtml(t, homeFreq)).join('');
+}
+
+// ─── DRAG & DROP ────────────────────────────────
+function dragStart(e, id) {
+  _dragId = id;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', id);
+  setTimeout(()=>{
+    const el = document.querySelector(`.task-item[data-id="${id}"]`);
+    if(el) el.classList.add('dragging');
+  }, 0);
+}
+
+function dragOver(e, id) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.task-item.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  if(id !== _dragId) {
+    const el = document.querySelector(`.task-item[data-id="${id}"]`);
+    if(el) el.classList.add('drag-over');
+  }
+}
+
+function dragEnd(e) {
+  document.querySelectorAll('.task-item.dragging,.task-item.drag-over').forEach(el=>{
+    el.classList.remove('dragging','drag-over');
+  });
+  _dragId = null;
+}
+
+async function dragDrop(e, targetId) {
+  e.preventDefault();
+  document.querySelectorAll('.task-item.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  const srcId = _dragId || e.dataTransfer.getData('text/plain');
+  if(!srcId || srcId === targetId) return;
+
+  // Get the sorted list containing these tasks (figure out which group)
+  const srcTask = tasks.find(t=>t.id===srcId);
+  const tgtTask = tasks.find(t=>t.id===targetId);
+  if(!srcTask || !tgtTask) return;
+  // Must be same group (same businessId and frequency)
+  if(srcTask.businessId !== tgtTask.businessId) return;
+
+  const freq = srcTask.frequency || 'daily';
+  const grp = sortedTasks(tasks.filter(t=>
+    t.businessId === srcTask.businessId &&
+    (t.frequency||'daily') === freq
+  ));
+
+  const srcIdx = grp.findIndex(t=>t.id===srcId);
+  const tgtIdx = grp.findIndex(t=>t.id===targetId);
+  if(srcIdx<0||tgtIdx<0) return;
+
+  // Remove src from array, insert at target position
+  const reordered = [...grp];
+  const [moved] = reordered.splice(srcIdx, 1);
+  reordered.splice(tgtIdx, 0, moved);
+
+  // Assign new order values and batch-update only changed tasks
+  const updates = [];
+  reordered.forEach((t, i) => {
+    const newOrder = (i+1) * 1000;
+    if(taskOrder(t) !== newOrder) {
+      updates.push(window._db.update('tasks', t.id, {order: newOrder}));
+    }
+  });
+  try { await Promise.all(updates); } catch(err) {}
+}
+
+// ─── TASK HTML ───────────────────────────────────
+function taskHtml(t, freq) {
+  const f = freq || t.frequency || 'daily';
+  return `<div class="task-item${t.done?' faded':''}"
+    data-id="${t.id}"
+    draggable="true"
+    ondragstart="dragStart(event,'${t.id}')"
+    ondragover="dragOver(event,'${t.id}')"
+    ondrop="dragDrop(event,'${t.id}')"
+    ondragend="dragEnd(event)">
+    <div class="drag-handle" title="Drag to reorder">⠿</div>
+    <div class="task-check${t.done?' on':''}" onclick="toggleTask('${t.id}')"></div>
+    <span class="task-text${t.done?' struck':''}" onclick="toggleTask('${t.id}')">${escHtml(t.text)}</span>
+    <button class="task-del" onclick="delTask('${t.id}')">✕</button>
+  </div>`;
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ─── DAILY TASKS (TASKS PAGE) ───────────────────
@@ -1240,19 +1537,24 @@ function renderDailyTasks(){
   const el=document.getElementById('daily-list');
   const personal=tasks.filter(t=>!t.businessId);
   const fromBiz =tasks.filter(t=>t.businessId);
-  const sortTasks=arr=>[...arr.filter(t=>!t.done),...arr.filter(t=>t.done)];
   let html='';
 
-  html+=`<div class="sec-hdr" style="margin-bottom:10px">
-    <span class="sec-label">Personal</span>
-    <button class="primary sm" onclick="openModal('addTask')">+ Add task</button>
-  </div>`;
-
-  if(!personal.length){
-    html+='<div class="empty-sm" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:16px;padding:14px">No personal tasks yet.</div>';
-  } else {
-    html+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px 12px;margin-bottom:16px">'+sortTasks(personal).map(t=>taskHtml(t)).join('')+'</div>';
-  }
+  ['daily','weekly','monthly'].forEach(freq=>{
+    const grp = sortedTasks(personal.filter(t=>(t.frequency||'daily')===freq));
+    html += `<div style="margin-bottom:20px">
+      <div class="sec-hdr" style="margin-bottom:10px">
+        <span class="sec-label">${freq.charAt(0).toUpperCase()+freq.slice(1)} Personal</span>
+        <button class="primary sm" onclick="openModal('addTask','${freq}')">+ Add</button>
+      </div>`;
+    if(!grp.length) {
+      html += `<div class="empty-sm" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px">No ${freq} tasks yet.</div>`;
+    } else {
+      html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px 12px">
+        ${grp.map(t=>taskHtml(t,freq)).join('')}
+      </div>`;
+    }
+    html += '</div>';
+  });
 
   if(fromBiz.length){
     html+=`<div class="sec-label" style="display:block;margin-bottom:10px">From Businesses</div>`;
@@ -1260,28 +1562,19 @@ function renderDailyTasks(){
     bizIds.forEach(bid=>{
       const biz=businesses.find(b=>b.id===bid);
       const col=biz?.color||'#4ade80';
-      const bTasks=fromBiz.filter(t=>t.businessId===bid);
+      const bTasks=sortedTasks(fromBiz.filter(t=>t.businessId===bid));
       html+=`<div style="margin-bottom:12px">
         <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px">
           <div style="width:6px;height:6px;border-radius:50%;background:${col}"></div>
-          <span style="font-family:var(--mono);font-size:10px;color:var(--t2)">${biz?.name||'Business'}</span>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--t2)">${escHtml(biz?.name||'Business')}</span>
         </div>
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px 12px">
-          ${sortTasks(bTasks).map(t=>taskHtml(t)).join('')}
+          ${bTasks.map(t=>taskHtml(t)).join('')}
         </div>
       </div>`;
     });
   }
-
   el.innerHTML=html;
-}
-
-function taskHtml(t){
-  return `<div class="task-item${t.done?' faded':''}">
-    <div class="task-check${t.done?' on':''}" onclick="toggleTask('${t.id}')"></div>
-    <span class="task-text${t.done?' struck':''}" onclick="toggleTask('${t.id}')">${t.text}</span>
-    <button class="task-del" onclick="delTask('${t.id}')">✕</button>
-  </div>`;
 }
 
 // ─── BUSINESS TAB ────────────────────────────────
@@ -1293,31 +1586,35 @@ function renderBizTab(){
   }
   el.innerHTML=businesses.map(b=>{
     const goals=bizGoals.filter(g=>g.businessId===b.id);
-    const bTasks=tasks.filter(t=>t.businessId===b.id);
+    const bTasks=sortedTasks(tasks.filter(t=>t.businessId===b.id));
     const r=bizRev(b.id), e=bizExp(b.id), n=r-e;
-    const sortedTasks=[...bTasks.filter(t=>!t.done),...bTasks.filter(t=>t.done)];
-    const goalsHtml=goals.length?goals.map(g=>bizGoalHtml(g,b)).join(''):'<div class="empty-sm">No goals for this business.</div>';
-    const tasksHtml=sortedTasks.length?sortedTasks.map(t=>taskHtml(t)).join(''):'<div class="empty-sm">No daily tasks for this business.</div>';
+    const isOpen = b._open === true;
+    const goalsHtml=goals.length
+      ? goals.map(g=>bizGoalHtml(g,b)).join('')
+      : '<div class="empty-sm">No goals yet. Click "+ Goal" to add one.</div>';
+    const tasksHtml=bTasks.length
+      ? bTasks.map(t=>taskHtml(t)).join('')
+      : '<div class="empty-sm">No tasks for this business.</div>';
 
     return `<div class="biz-card">
       <div class="biz-card-hdr" onclick="toggleBiz('${b.id}')">
         <div class="biz-dot" style="background:${b.color||'#4ade80'}"></div>
-        <span class="biz-name">${b.name}</span>
-        <span class="biz-meta">${fmt(r)} rev · ${fmt(e)} exp · ${goals.length} goal${goals.length!==1?'s':''}</span>
+        <span class="biz-name">${escHtml(b.name)}</span>
+        <span class="biz-meta">${fmt(r)} rev · ${goals.length} goal${goals.length!==1?'s':''}</span>
         <div class="biz-hdr-acts" onclick="event.stopPropagation()">
           <button class="ghost" onclick="openModal('addBizGoal','${b.id}')">+ Goal</button>
           <button class="ghost" onclick="openModal('addBizTask','${b.id}')">+ Task</button>
           <button class="ghost" style="color:var(--red)" onclick="delBiz('${b.id}')">✕</button>
         </div>
-        <span style="font-family:var(--mono);color:var(--t3);font-size:10px;margin-left:4px">${b._open?'▴':'▾'}</span>
+        <span style="font-family:var(--mono);color:var(--t3);font-size:10px;margin-left:4px">${isOpen?'▴':'▾'}</span>
       </div>
-      <div class="biz-body" ${b._open?'':'style="display:none"'}>
+      <div class="biz-body" style="${isOpen?'':'display:none'}">
         <div class="biz-section">
           <div class="biz-sec-hdr">
             <span class="biz-sec-label">Long-term Goals</span>
             <div style="display:flex;gap:6px">
-              <button class="ghost" onclick="openModal('logIncome',null,'${b.id}')">+ Income</button>
-              <button class="ghost" onclick="openModal('logExpense',null,'${b.id}')">− Expense</button>
+              <button class="ghost" onclick="openModal('logIncome','','${b.id}')">+ Income</button>
+              <button class="ghost" onclick="openModal('logExpense','','${b.id}')">− Expense</button>
               <button class="primary sm" onclick="openModal('addBizGoal','${b.id}')">+ Goal</button>
             </div>
           </div>
@@ -1341,10 +1638,11 @@ function bizGoalHtml(g, b){
   const subs=g.subtasks||[];
   const doneCount=subs.filter(s=>s.done).length;
   const r=goalRev(g.id), e=goalExp(g.id), n=r-e;
+  const isOpen = g._open === true;
   const subsHtml=subs.map((s,i)=>`
     <div class="sub-row">
       <div class="sub-ck${s.done?' on':''}" onclick="toggleSub('${g.id}',${i})"></div>
-      <span class="sub-txt${s.done?' done':''}" onclick="toggleSub('${g.id}',${i})">${s.text}</span>
+      <span class="sub-txt${s.done?' done':''}" onclick="toggleSub('${g.id}',${i})">${escHtml(s.text)}</span>
       <button class="sub-del" onclick="delSub('${g.id}',${i})">✕</button>
     </div>`).join('');
 
@@ -1352,27 +1650,27 @@ function bizGoalHtml(g, b){
     <div class="bg-row">
       <div class="bg-check${g.done?' on':''}" onclick="toggleBizGoal('${g.id}')"></div>
       <span class="bg-name${g.done?' done':''}">
-        ${g.name}
+        ${escHtml(g.name)}
         ${subs.length?`<span style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-left:6px">${doneCount}/${subs.length}</span>`:''}
       </span>
-      <span class="bg-money">
+      <div class="bg-money">
         <span class="tg">${fmt(r)}</span>
-        <span style="color:var(--t3);margin:0 3px">/</span>
+        <span style="color:var(--t3);margin:0 2px">/</span>
         <span class="tr">${fmt(e)}</span>
-        <span style="color:${n>=0?'var(--green)':'var(--red)'};margin-left:4px">(${n>=0?'+':''}${fmt(n)})</span>
-      </span>
-      <button class="bg-caret${g._open?' open':''}" onclick="toggleBizGoalOpen('${g.id}')">▾</button>
+        <span style="color:${n>=0?'var(--green)':'var(--red)'};margin-left:3px">(${n>=0?'+':''}${fmt(n)})</span>
+      </div>
+      <button class="bg-caret${isOpen?' open':''}" onclick="toggleBizGoalOpen('${g.id}')">▾</button>
       <button class="bg-del" onclick="delBizGoal('${g.id}')">✕</button>
     </div>
-    <div class="bg-body" ${g._open?'':'style="display:none"'}>
+    <div class="bg-body" style="${isOpen?'':'display:none'}">
       ${subsHtml}
       <div class="add-sub-row">
         <input type="text" placeholder="Add sub-task…" id="si-${g.id}" onkeydown="if(event.key==='Enter')addSub('${g.id}')">
         <button class="primary sm" onclick="addSub('${g.id}')">Add</button>
       </div>
       <div class="tx-footer">
-        <button class="txbtn inc" onclick="openModal('logIncome','${g.id}')">+ Income</button>
-        <button class="txbtn xp" onclick="openModal('logExpense',null,'${b.id}','${g.id}')">− Expense</button>
+        <button class="txbtn inc" onclick="openModal('logIncome','${g.id}','${b.id}')">+ Income</button>
+        <button class="txbtn xp" onclick="openModal('logExpense','${g.id}','${b.id}')">− Expense</button>
         <button class="txbtn" onclick="openGoalHistory('${g.id}')">History</button>
       </div>
     </div>
@@ -1388,7 +1686,7 @@ function switchTaskTab(tab){
   document.getElementById('pane-biz').style.display=tab==='business'?'':'none';
   document.getElementById('tasks-hdr-btn').innerHTML=
     tab==='daily'
-      ?'<button class="primary sm" onclick="openModal(\'addTask\')">+ Add task</button>'
+      ?''
       :'<button class="primary sm" onclick="openModal(\'addBusiness\')">+ Add business</button>';
 }
 
@@ -1407,25 +1705,25 @@ function renderFinancials(){
       <td style="font-weight:600">
         <div style="display:flex;align-items:center;gap:8px">
           <div style="width:6px;height:6px;border-radius:50%;background:${b.color||'#4ade80'}"></div>
-          ${b.name}
+          ${escHtml(b.name)}
         </div>
       </td>
-      <td class="mono tg">${fmt(r)}</td>
-      <td class="mono tr">${fmt(e)}</td>
-      <td class="mono ${n>=0?'tg':'tr'}">${n>=0?'+':''}${fmt(n)}</td>
+      <td class="mono tg">${fmtFull(r)}</td>
+      <td class="mono tr">${fmtFull(e)}</td>
+      <td class="mono ${n>=0?'tg':'tr'}">${n>=0?'+':''}${fmtFull(n)}</td>
       <td>
-        <button class="act-btn" onclick="openModal('logIncome',null,'${b.id}')">+ Income</button>
-        <button class="act-btn" onclick="openModal('logExpense',null,'${b.id}')">− Expense</button>
+        <button class="act-btn" onclick="openModal('logIncome','','${b.id}')">+ Income</button>
+        <button class="act-btn" onclick="openModal('logExpense','','${b.id}')">− Expense</button>
       </td>
     </tr>`;
     bizGoals.filter(g=>g.businessId===b.id).forEach(g=>{
       const gr=goalRev(g.id), ge=goalExp(g.id), gn=gr-ge;
       rows+=`<tr>
-        <td style="padding-left:32px;color:var(--t2)">↳ ${g.name}</td>
-        <td class="mono tg">${fmt(gr)}</td>
-        <td class="mono tr">${fmt(ge)}</td>
-        <td class="mono ${gn>=0?'tg':'tr'}">${gn>=0?'+':''}${fmt(gn)}</td>
-        <td><button class="act-btn" onclick="openModal('logIncome','${g.id}')">+ Income</button></td>
+        <td style="padding-left:32px;color:var(--t2)">↳ ${escHtml(g.name)}</td>
+        <td class="mono tg">${fmtFull(gr)}</td>
+        <td class="mono tr">${fmtFull(ge)}</td>
+        <td class="mono ${gn>=0?'tg':'tr'}">${gn>=0?'+':''}${fmtFull(gn)}</td>
+        <td><button class="act-btn" onclick="openModal('logIncome','${g.id}','${b.id}')">+ Income</button></td>
       </tr>`;
     });
   });
@@ -1433,9 +1731,9 @@ function renderFinancials(){
   const tr=totRev(), te=totExp(), tn=netP();
   document.getElementById('finFoot').innerHTML=`<tr>
     <td style="font-weight:600;font-family:var(--mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--t3)">Total</td>
-    <td class="mono tg" style="font-weight:600">${fmt(tr)}</td>
-    <td class="mono tr" style="font-weight:600">${fmt(te)}</td>
-    <td class="mono ${tn>=0?'tg':'tr'}" style="font-weight:600">${tn>=0?'+':''}${fmt(tn)}</td>
+    <td class="mono tg" style="font-weight:600">${fmtFull(tr)}</td>
+    <td class="mono tr" style="font-weight:600">${fmtFull(te)}</td>
+    <td class="mono ${tn>=0?'tg':'tr'}" style="font-weight:600">${tn>=0?'+':''}${fmtFull(tn)}</td>
     <td></td>
   </tr>`;
 }
@@ -1450,11 +1748,11 @@ function renderTxList(){
     const inc=t.type==='income';
     return `<div class="tx-item">
       <div class="tx-dot" style="background:${inc?'var(--green)':'var(--red)'}"></div>
-      <div style="flex:1">
-        <div class="tx-label">${t.desc||(inc?'Income':'Expense')}</div>
-        <div class="tx-sub">${biz?biz.name:'—'}${g?' · '+g.name:''} · ${fmtD(t.date)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="tx-label">${escHtml(t.desc||(inc?'Income':'Expense'))}</div>
+        <div class="tx-sub">${biz?escHtml(biz.name):'—'}${g?' · '+escHtml(g.name):''} · ${fmtD(t.date)}</div>
       </div>
-      <div class="tx-amt ${inc?'tg':'tr'}">${inc?'+':'−'}${fmt(t.amount)}</div>
+      <div class="tx-amt ${inc?'tg':'tr'}">${inc?'+':'−'}${fmtFull(t.amount)}</div>
       <button class="act-btn del" onclick="delTxn('${t.id}')">✕</button>
     </div>`;
   }).join('');
@@ -1469,12 +1767,12 @@ function renderExpenses(){
     const biz=businesses.find(b=>b.id===e.businessId);
     const g=bizGoals.find(x=>x.id===e.bizGoalId);
     return `<tr>
-      <td>${e.desc||'—'}</td>
+      <td>${escHtml(e.desc||'—')}</td>
       <td><span class="exp-cat ${cc[e.category]||'co'}">${e.category||'other'}</span></td>
-      <td class="tm mono">${biz?biz.name:'—'}</td>
-      <td class="tm mono">${g?g.name:'—'}</td>
+      <td class="tm mono">${biz?escHtml(biz.name):'—'}</td>
+      <td class="tm mono">${g?escHtml(g.name):'—'}</td>
       <td class="tm mono">${fmtD(e.date)}</td>
-      <td class="mono tr">${fmt(e.amount)}</td>
+      <td class="mono tr">${fmtFull(e.amount)}</td>
       <td><button class="act-btn del" onclick="delExp('${e.id}')">✕</button></td>
     </tr>`;
   }).join('');
@@ -1487,7 +1785,7 @@ function renderExpStats(){
     const t=expenses.filter(e=>e.category===c).reduce((s,e)=>s+(+e.amount||0),0);
     return `<div class="stat-card">
       <div class="stat-label">${c}</div>
-      <div class="stat-value">${fmt(t)}</div>
+      <div class="stat-value">${fmtFull(t)}</div>
     </div>`;
   }).join('');
 }
@@ -1505,10 +1803,10 @@ async function quickAddTask(){
   const text=inp?.value.trim();
   if(!text) return;
   try{
-    await window._db.add('tasks',{text,done:false});
+    await window._db.add('tasks',{text,done:false,frequency:homeFreq,order:Date.now()});
     inp.value='';
     toast('Task added ✓');
-  }catch(e){toast('Error')}
+  }catch(e){toast('Error adding task')}
 }
 
 // ─── BIZ GOAL ACTIONS ───────────────────────────
@@ -1539,8 +1837,14 @@ async function delSub(gid,idx){
   try{await window._db.update('bizGoals',gid,{subtasks:subs})}catch(e){}
 }
 async function delBizGoal(id){
-  if(!confirm('Delete this goal?'))return;
-  try{await window._db.del('bizGoals',id);toast('Goal deleted')}catch(e){}
+  if(!confirm('Delete this goal and its transactions?'))return;
+  try{
+    await window._db.del('bizGoals',id);
+    // Clean up related transactions
+    for(const t of txns.filter(t=>t.bizGoalId===id)) await window._db.del('txns',t.id);
+    for(const e of expenses.filter(e=>e.bizGoalId===id)) await window._db.del('expenses',e.id);
+    toast('Goal deleted');
+  }catch(e){toast('Error')}
 }
 
 // ─── BIZ ACTIONS ────────────────────────────────
@@ -1560,7 +1864,14 @@ async function delBiz(id){
   }catch(e){toast('Error')}
 }
 async function delTxn(id){ try{await window._db.del('txns',id)}catch(e){} }
-async function delExp(id){ try{await window._db.del('expenses',id)}catch(e){} }
+async function delExp(id){
+  try{
+    await window._db.del('expenses',id);
+    // Also remove matching txn entry if exists
+    const match = txns.find(t=>t.type==='expense' && t.id===id);
+    if(match) await window._db.del('txns',id);
+  }catch(e){}
+}
 
 // ─── GOAL HISTORY ────────────────────────────────
 function openGoalHistory(gid){
@@ -1572,77 +1883,83 @@ function openGoalHistory(gid){
   ].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
 
   const box=document.getElementById('modalBox');
-  box.innerHTML=`<h2>${g?.name||'Goal'}</h2>
-    <div style="display:flex;gap:24px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)">
-      <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);margin-bottom:4px">Revenue</div><div style="font-family:var(--mono);font-size:18px;font-weight:500;color:var(--green)">${fmt(r)}</div></div>
-      <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);margin-bottom:4px">Expenses</div><div style="font-family:var(--mono);font-size:18px;font-weight:500;color:var(--red)">${fmt(e)}</div></div>
-      <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);margin-bottom:4px">Net</div><div style="font-family:var(--mono);font-size:18px;font-weight:500;color:${n>=0?'var(--green)':'var(--red)'}">${fmt(n)}</div></div>
+  box.innerHTML=`<h2>${escHtml(g?.name||'Goal')}</h2>
+    <div style="display:flex;gap:20px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border);flex-wrap:wrap">
+      <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);margin-bottom:4px">Revenue</div><div style="font-family:var(--mono);font-size:18px;font-weight:500;color:var(--green)">${fmtFull(r)}</div></div>
+      <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);margin-bottom:4px">Expenses</div><div style="font-family:var(--mono);font-size:18px;font-weight:500;color:var(--red)">${fmtFull(e)}</div></div>
+      <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);margin-bottom:4px">Net</div><div style="font-family:var(--mono);font-size:18px;font-weight:500;color:${n>=0?'var(--green)':'var(--red)'}">${fmtFull(n)}</div></div>
     </div>
     <div>
       ${items.length?items.map(item=>{const inc=item._k==='inc';return`<div class="tx-item">
         <div class="tx-dot" style="background:${inc?'var(--green)':'var(--red)'}"></div>
-        <div style="flex:1"><div class="tx-label">${item.desc||'—'}</div><div class="tx-sub">${fmtD(item.date)}</div></div>
-        <div class="tx-amt ${inc?'tg':'tr'}">${inc?'+':'−'}${fmt(item.amount)}</div>
+        <div style="flex:1;min-width:0"><div class="tx-label">${escHtml(item.desc||'—')}</div><div class="tx-sub">${fmtD(item.date)}</div></div>
+        <div class="tx-amt ${inc?'tg':'tr'}">${inc?'+':'−'}${fmtFull(item.amount)}</div>
       </div>`}).join(''):'<div class="empty">No transactions yet.</div>'}
     </div>
     <div class="modal-footer">
       <button class="secondary" onclick="closeModal()">Close</button>
-      <button class="primary" onclick="closeModal();setTimeout(()=>openModal('logIncome','${gid}'),60)">+ Income</button>
+      <button class="primary" onclick="closeModal();setTimeout(()=>openModal('logIncome','${gid}','${g?.businessId||''}'),60)">+ Income</button>
     </div>`;
   document.getElementById('modalOverlay').classList.add('open');
 }
 
 // ─── MODALS ─────────────────────────────────────
-function openModal(type, bizGoalId, bizId, alsoGoalId){
+function openModal(type, arg1, arg2, arg3){
+  // arg meanings per modal type:
+  // addTask(freq), addBizTask(bizId), addBusiness(), addBizGoal(bizId)
+  // logIncome(goalId, bizId), logExpense(goalId, bizId)
   const box=document.getElementById('modalBox');
 
   if(type==='addTask'){
-    box.innerHTML=`<h2>New task</h2>
-      <div class="fr"><label>Task</label><input type="text" id="m-t" placeholder="e.g. Reply to emails" onkeydown="if(event.key==='Enter')saveTask()"></div>
-      <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveTask()">Add task</button></div>`;
+    const freq = arg1||'daily';
+    box.innerHTML=`<h2>New ${freq} task</h2>
+      <div class="fr"><label>Task</label><input type="text" id="m-t" placeholder="e.g. Reply to emails" onkeydown="if(event.key==='Enter')saveTask('${freq}')"></div>
+      <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveTask('${freq}')">Add task</button></div>`;
   }
   else if(type==='addBizTask'){
+    const bizId=arg1||'';
     const biz=businesses.find(b=>b.id===bizId);
-    box.innerHTML=`<h2>New task — ${biz?.name||'Business'}</h2>
+    box.innerHTML=`<h2>New task — ${escHtml(biz?.name||'Business')}</h2>
       <div class="fr"><label>Task</label><input type="text" id="m-t" placeholder="e.g. Post on Instagram" onkeydown="if(event.key==='Enter')saveBizTask('${bizId}')"></div>
       <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveBizTask('${bizId}')">Add</button></div>`;
   }
   else if(type==='addBusiness'){
-    _selColor=COLORS[businesses.length%COLORS.length];
+    _selColor=randomColor();
     box.innerHTML=`<h2>New business</h2>
       <div class="fr"><label>Name</label><input type="text" id="m-t" placeholder="e.g. My SaaS" onkeydown="if(event.key==='Enter')saveBusiness()"></div>
       <div class="fr"><label>Color</label><div class="swatches">${COLORS.map(c=>`<div class="swatch${c===_selColor?' sel':''}" style="background:${c}" onclick="pickColor('${c}',this)"></div>`).join('')}</div></div>
       <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveBusiness()">Create</button></div>`;
   }
   else if(type==='addBizGoal'){
+    const bizId=arg1||'';
     const biz=businesses.find(b=>b.id===bizId);
-    box.innerHTML=`<h2>New goal — ${biz?.name||'Business'}</h2>
+    box.innerHTML=`<h2>New goal — ${escHtml(biz?.name||'Business')}</h2>
       <div class="fr"><label>Goal name</label><input type="text" id="m-t" placeholder="e.g. Reach 1,000 customers" onkeydown="if(event.key==='Enter')saveBizGoal('${bizId}')"></div>
       <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveBizGoal('${bizId}')">Add goal</button></div>`;
   }
   else if(type==='logIncome'){
-    const preGoal=bizGoalId||'';
-    const goal=bizGoals.find(g=>g.id===preGoal);
-    const preBiz=bizId||(goal?.businessId)||'';
-    const bizOpts=businesses.map(b=>`<option value="${b.id}" ${b.id===preBiz?'selected':''}>${b.name}</option>`).join('');
-    const goalOpts=bizGoals.filter(g=>!preBiz||g.businessId===preBiz).map(g=>`<option value="${g.id}" ${g.id===preGoal?'selected':''}>${g.name}</option>`).join('');
-    box.innerHTML=`<h2>Log income${goal?' — '+goal.name:''}</h2>
+    // arg1 = goalId (optional), arg2 = bizId (optional)
+    const preGoal=arg1||'';
+    const preBiz=arg2||(bizGoals.find(g=>g.id===preGoal)?.businessId)||'';
+    const bizOpts=businesses.map(b=>`<option value="${b.id}" ${b.id===preBiz?'selected':''}>${escHtml(b.name)}</option>`).join('');
+    const allGoalOpts=bizGoals.map(g=>`<option value="${g.id}" ${g.id===preGoal?'selected':''}>${escHtml(g.name)}</option>`).join('');
+    box.innerHTML=`<h2>Log income${preGoal?' — '+escHtml(bizGoals.find(g=>g.id===preGoal)?.name||''):''}</h2>
       <div class="fr"><label>Description</label><input type="text" id="m-desc" placeholder="e.g. Client payment"></div>
       <div class="g2">
         <div class="fr"><label>Amount ($)</label><input type="number" id="m-amt" placeholder="0.00" min="0" step="0.01"></div>
         <div class="fr"><label>Date</label><input type="date" id="m-date" value="${today()}"></div>
       </div>
       <div class="g2">
-        <div class="fr"><label>Business</label><select id="m-biz"><option value="">— None —</option>${bizOpts}</select></div>
-        <div class="fr"><label>Goal (optional)</label><select id="m-goal"><option value="">— None —</option>${goalOpts}</select></div>
+        <div class="fr"><label>Business</label><select id="m-biz" onchange="updateGoalOpts()"><option value="">— None —</option>${bizOpts}</select></div>
+        <div class="fr"><label>Goal (optional)</label><select id="m-goal"><option value="">— None —</option>${allGoalOpts}</select></div>
       </div>
       <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveIncome()">Log income</button></div>`;
   }
   else if(type==='logExpense'){
-    const preBiz=bizId||'';
-    const preGoal=alsoGoalId||'';
-    const bizOpts=businesses.map(b=>`<option value="${b.id}" ${b.id===preBiz?'selected':''}>${b.name}</option>`).join('');
-    const goalOpts=bizGoals.filter(g=>!preBiz||g.businessId===preBiz).map(g=>`<option value="${g.id}" ${g.id===preGoal?'selected':''}>${g.name}</option>`).join('');
+    const preGoal=arg1||'';
+    const preBiz=arg2||(bizGoals.find(g=>g.id===preGoal)?.businessId)||'';
+    const bizOpts=businesses.map(b=>`<option value="${b.id}" ${b.id===preBiz?'selected':''}>${escHtml(b.name)}</option>`).join('');
+    const allGoalOpts=bizGoals.map(g=>`<option value="${g.id}" ${g.id===preGoal?'selected':''}>${escHtml(g.name)}</option>`).join('');
     box.innerHTML=`<h2>Log expense</h2>
       <div class="fr"><label>Description</label><input type="text" id="m-desc" placeholder="e.g. Facebook ads"></div>
       <div class="g2">
@@ -1651,14 +1968,24 @@ function openModal(type, bizGoalId, bizId, alsoGoalId){
       </div>
       <div class="g2">
         <div class="fr"><label>Category</label><select id="m-cat"><option value="tools">Tools</option><option value="ads">Ads</option><option value="software">Software</option><option value="other">Other</option></select></div>
-        <div class="fr"><label>Business</label><select id="m-biz"><option value="">— None —</option>${bizOpts}</select></div>
+        <div class="fr"><label>Business</label><select id="m-biz" onchange="updateGoalOpts()"><option value="">— None —</option>${bizOpts}</select></div>
       </div>
-      <div class="fr"><label>Goal (optional)</label><select id="m-goal"><option value="">— None —</option>${goalOpts}</select></div>
+      <div class="fr"><label>Goal (optional)</label><select id="m-goal"><option value="">— None —</option>${allGoalOpts}</select></div>
       <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveExpense()">Log expense</button></div>`;
   }
 
   document.getElementById('modalOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('modalBox').querySelector('input,select')?.focus(),50);
+}
+
+function updateGoalOpts() {
+  const bizSel = document.getElementById('m-biz');
+  const goalSel = document.getElementById('m-goal');
+  if(!bizSel||!goalSel) return;
+  const bid = bizSel.value;
+  const filtered = bid ? bizGoals.filter(g=>g.businessId===bid) : bizGoals;
+  goalSel.innerHTML = `<option value="">— None —</option>` +
+    filtered.map(g=>`<option value="${g.id}">${escHtml(g.name)}</option>`).join('');
 }
 
 function pickColor(c,el){
@@ -1685,33 +2012,44 @@ function unlock(label){
   if(b){b.disabled=false;b.textContent=label||'Save'}
 }
 
-async function saveTask(){
+async function saveTask(freq){
   if(!lock('Adding…'))return;
   const text=document.getElementById('m-t')?.value.trim();
   if(!text){unlock('Add task');return}
-  try{await window._db.add('tasks',{text,done:false});closeModal();toast('Task added ✓')}
-  catch(e){toast('Error');unlock('Add task')}
+  try{
+    await window._db.add('tasks',{text,done:false,frequency:freq||'daily',order:Date.now()});
+    closeModal();toast('Task added ✓');
+  }catch(e){toast('Error');unlock('Add task')}
 }
 async function saveBizTask(bizId){
   if(!lock('Adding…'))return;
   const text=document.getElementById('m-t')?.value.trim();
   if(!text){unlock('Add task');return}
-  try{await window._db.add('tasks',{text,done:false,businessId:bizId});closeModal();toast('Task added ✓')}
-  catch(e){toast('Error');unlock('Add task')}
+  try{
+    await window._db.add('tasks',{text,done:false,businessId:bizId,order:Date.now()});
+    closeModal();toast('Task added ✓');
+  }catch(e){toast('Error');unlock('Add task')}
 }
 async function saveBusiness(){
   if(!lock('Creating…'))return;
   const name=document.getElementById('m-t')?.value.trim();
   if(!name){unlock('Create');return}
-  try{await window._db.add('businesses',{name,color:_selColor,_open:true});closeModal();toast('Business created ✓')}
-  catch(e){toast('Error');unlock('Create')}
+  try{
+    await window._db.add('businesses',{name,color:_selColor,_open:true});
+    closeModal();toast('Business created ✓');
+  }catch(e){toast('Error');unlock('Create')}
 }
 async function saveBizGoal(bizId){
   if(!lock('Adding…'))return;
   const name=document.getElementById('m-t')?.value.trim();
   if(!name){unlock('Add goal');return}
-  try{await window._db.add('bizGoals',{name,businessId:bizId,done:false,subtasks:[],_open:false});closeModal();toast('Goal added ✓')}
-  catch(e){toast('Error');unlock('Add goal')}
+  try{
+    await window._db.add('bizGoals',{name,businessId:bizId,done:false,subtasks:[],_open:false});
+    closeModal();toast('Goal added ✓');
+    // Auto-expand the business so user can see it
+    const biz=businesses.find(b=>b.id===bizId);
+    if(biz&&!biz._open) await window._db.update('businesses',bizId,{_open:true});
+  }catch(e){toast('Error');unlock('Add goal')}
 }
 async function saveIncome(){
   if(!lock('Saving…'))return;
@@ -1737,17 +2075,23 @@ async function saveExpense(){
     const date=document.getElementById('m-date')?.value||today();
     const cat=document.getElementById('m-cat')?.value||'other';
     await window._db.add('expenses',{desc,amount:amt,date,category:cat,businessId:bid,bizGoalId:gid});
-    await window._db.add('txns',{type:'expense',desc,amount:amt,date,businessId:bid,bizGoalId:gid});
     closeModal();toast('Expense logged ✓');
   }catch(e){toast('Error');unlock('Log expense')}
 }
 
 // ─── NAV ────────────────────────────────────────
-function showPage(name, btn){
+function showPage(name, sidebarBtn, mobBtnId){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.mob-btn').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  if(btn) btn.classList.add('active');
+  if(sidebarBtn) sidebarBtn.classList.add('active');
+  if(mobBtnId) document.getElementById(mobBtnId)?.classList.add('active');
+  // Sync sidebar button
+  const sidebarBtns = document.querySelectorAll('.sidebar .nav-item');
+  const pageOrder = ['home','financial','tasks','expenses'];
+  const idx = pageOrder.indexOf(name);
+  if(idx>=0 && sidebarBtns[idx]) sidebarBtns[idx].classList.add('active');
   if(name==='tasks') switchTaskTab(currentTab);
 }
 
