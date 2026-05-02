@@ -57,6 +57,7 @@
   --amber:     #fbbf24;
   --blue:      #60a5fa;
   --blue-dim:  #1a2840;
+  --purple:    #c084fc;
   --accent:    #e8e8e8;
   --mono: 'IBM Plex Mono', monospace;
   --sans: 'Syne', sans-serif;
@@ -215,7 +216,7 @@ body {
 /* ── STAT CARDS ── */
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1px;
   margin-bottom: 20px;
   background: var(--border);
@@ -237,13 +238,15 @@ body {
 }
 .stat-value {
   font-family: var(--mono);
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 500;
   letter-spacing: -0.02em;
   color: var(--text);
 }
-.stat-value.green { color: var(--green) }
-.stat-value.red   { color: var(--red) }
+.stat-value.green  { color: var(--green) }
+.stat-value.red    { color: var(--red) }
+.stat-value.blue   { color: var(--blue) }
+.stat-value.purple { color: var(--purple) }
 .stat-sub {
   font-family: var(--mono);
   font-size: 10px;
@@ -391,7 +394,7 @@ body {
 .freq-tab:hover { color: var(--t2) }
 .freq-tab.active { color: var(--text); border-bottom-color: var(--text) }
 
-.tasks-inner { flex: 1; overflow-y: auto; max-height: 260px; padding: 6px 12px }
+.tasks-inner { flex: 1; overflow-y: auto; max-height: 280px; padding: 6px 12px }
 .quick-add-row {
   display: flex;
   gap: 6px;
@@ -491,6 +494,14 @@ body {
 }
 .task-item:hover .task-del { opacity: 1 }
 .task-del:hover { color: var(--red) }
+
+.recurring-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--blue);
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+}
 
 /* ── TABS ── */
 .tab-row {
@@ -685,6 +696,7 @@ tfoot td { padding: 11px 16px; font-family: var(--mono); font-size: 12px; border
 .mono { font-family: var(--mono) }
 .tg { color: var(--green) }
 .tr { color: var(--red) }
+.tb { color: var(--blue) }
 .tm { color: var(--t3) }
 
 .tx-item {
@@ -715,6 +727,120 @@ tfoot td { padding: 11px 16px; font-family: var(--mono); font-size: 12px; border
 .ca { background: #2a1a40; color: #c084fc }
 .cs { background: var(--green-dim); color: var(--green) }
 .co { background: var(--bg4); color: var(--t3) }
+.cm { background: #2a1a00; color: var(--amber) }
+
+/* ── INVENTORY ── */
+.inv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.inv-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  position: relative;
+  transition: border-color 0.12s;
+}
+.inv-card.low { border-color: #554000; }
+.inv-card:hover { border-color: var(--border2) }
+.inv-name { font-size: 14px; font-weight: 600; margin-bottom: 2px }
+.inv-cat {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 10px;
+}
+.inv-notes { font-family: var(--mono); font-size: 10px; color: var(--t3); margin-bottom: 10px; word-break: break-word }
+.inv-qty-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.inv-qty {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 500;
+  min-width: 36px;
+  text-align: center;
+  line-height: 1;
+}
+.inv-unit {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t3);
+}
+.qty-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--t2);
+  font-family: var(--mono);
+  font-weight: 500;
+  transition: all 0.12s;
+  flex-shrink: 0;
+}
+.qty-btn:hover { background: var(--bg4); color: var(--text) }
+.qty-btn.plus:hover { border-color: var(--green); color: var(--green) }
+.qty-btn.minus:hover { border-color: var(--red); color: var(--red) }
+.inv-del-btn {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: none; border: none;
+  cursor: pointer;
+  color: var(--t4);
+  font-size: 11px;
+  font-family: var(--mono);
+  opacity: 0;
+  transition: opacity 0.12s, color 0.12s;
+}
+.inv-card:hover .inv-del-btn { opacity: 1 }
+.inv-del-btn:hover { color: var(--red) }
+.low-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--amber);
+  background: #2a2000;
+  border: 1px solid #554000;
+  padding: 2px 6px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+/* ── MRR ROW ── */
+.mrr-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.mrr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.mrr-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.mrr-row:last-child { border-bottom: none }
+.mrr-row:hover { background: var(--bg3) }
 
 /* ── FORMS / INPUTS ── */
 input, select, textarea {
@@ -735,6 +861,25 @@ select option { background: var(--bg3) }
 .fr { margin-bottom: 12px }
 .fr label { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--t3); margin-bottom: 5px }
 .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px }
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+.toggle-row input[type="checkbox"] {
+  width: 16px; height: 16px;
+  cursor: pointer;
+  accent-color: var(--blue);
+}
+.toggle-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--t2);
+}
 
 button.primary {
   background: var(--text);
@@ -905,6 +1050,7 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
   .home-grid {
     grid-template-columns: 1fr;
   }
+  .stats-row { grid-template-columns: repeat(2, 1fr) }
 }
 
 @media (max-width: 768px) {
@@ -916,10 +1062,7 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
   .stats-row {
     grid-template-columns: 1fr 1fr;
   }
-  .stats-row .stat-card:last-child {
-    grid-column: 1 / -1;
-  }
-  .stat-value { font-size: 20px }
+  .stat-value { font-size: 18px }
   .charts-row {
     grid-template-columns: 1fr;
   }
@@ -932,7 +1075,9 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
   .biz-row .biz-num:last-child { display: none }
   table { display: block; overflow-x: auto }
   .g2 { grid-template-columns: 1fr }
+  .g3 { grid-template-columns: 1fr 1fr }
   .tx-footer { padding-left: 12px }
+  .inv-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) }
 
   .mobile-nav {
     display: flex;
@@ -950,17 +1095,17 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 2px;
     background: none;
     border: none;
     cursor: pointer;
     color: var(--t3);
     font-family: var(--mono);
-    font-size: 8px;
-    letter-spacing: 0.05em;
+    font-size: 7px;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     transition: color 0.12s;
-    padding: 8px 4px;
+    padding: 8px 2px;
     position: relative;
   }
   .mob-btn.active { color: var(--text) }
@@ -972,17 +1117,18 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
     background: var(--text);
     border-radius: 0 0 2px 2px;
   }
-  .mob-icon { font-size: 16px; line-height: 1 }
+  .mob-icon { font-size: 15px; line-height: 1 }
 
   #toast { bottom: 76px; right: 12px; left: 12px; text-align: center }
 }
 
 @media (max-width: 480px) {
   .content { padding: 12px 12px 80px }
-  .stat-value { font-size: 17px }
+  .stat-value { font-size: 15px }
   .biz-row { grid-template-columns: 8px 1fr 72px }
   .biz-row .biz-num:nth-child(4),
   .biz-row .biz-num:last-child { display: none }
+  .stats-row { grid-template-columns: 1fr 1fr }
 }
 </style>
 </head>
@@ -1006,6 +1152,9 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
     </button>
     <button class="nav-item" onclick="showPage('expenses',this)">
       <span class="ni-icon">◇</span> Expenses
+    </button>
+    <button class="nav-item" onclick="showPage('inventory',this)">
+      <span class="ni-icon">▣</span> Inventory
     </button>
     <div class="sidebar-footer">
       <div class="status-dot" id="statusDot"></div>
@@ -1040,6 +1189,11 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
           <div class="stat-label">Net Profit</div>
           <div class="stat-value" id="s-net">$0</div>
           <div class="stat-sub" id="s-net-sub">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">MRR</div>
+          <div class="stat-value blue" id="s-mrr">$0</div>
+          <div class="stat-sub" id="s-mrr-sub">this month</div>
         </div>
       </div>
 
@@ -1090,6 +1244,7 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
               <button class="freq-tab active" id="ht-d" onclick="switchHomeFreq('daily')">Daily</button>
               <button class="freq-tab" id="ht-w" onclick="switchHomeFreq('weekly')">Weekly</button>
               <button class="freq-tab" id="ht-m" onclick="switchHomeFreq('monthly')">Monthly</button>
+              <button class="freq-tab" id="ht-r" onclick="switchHomeFreq('recurring')">↺ Repeat</button>
             </div>
             <div class="tasks-inner" id="home-tasks"></div>
             <div class="quick-add-row">
@@ -1111,14 +1266,15 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
         <div class="ph-actions">
           <button class="primary sm" onclick="openModal('logIncome')">+ Income</button>
           <button class="secondary sm" onclick="openModal('logExpense')">− Expense</button>
+          <button class="secondary sm" onclick="openModal('logMRR')">↺ MRR</button>
         </div>
       </div>
       <div class="table-card" style="margin-bottom:16px">
         <table>
           <thead>
-            <tr><th>Business / Goal</th><th>Revenue</th><th>Expenses</th><th>Net</th><th></th></tr>
+            <tr><th>Business / Goal</th><th>Revenue</th><th>Expenses</th><th>Net</th><th>MRR</th><th></th></tr>
           </thead>
-          <tbody id="finBody"><tr><td colspan="5"><div class="empty">No businesses yet.</div></td></tr></tbody>
+          <tbody id="finBody"><tr><td colspan="6"><div class="empty">No businesses yet.</div></td></tr></tbody>
           <tfoot id="finFoot"></tfoot>
         </table>
       </div>
@@ -1152,12 +1308,27 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
         </div>
         <button class="primary sm" onclick="openModal('logExpense')">+ Add expense</button>
       </div>
-      <div class="stats-row" id="expStats" style="margin-bottom:16px; grid-template-columns: repeat(4,1fr)"></div>
+      <div class="stats-row" id="expStats" style="margin-bottom:16px; grid-template-columns: repeat(5,1fr)"></div>
       <div class="table-card">
         <table>
           <thead><tr><th>Description</th><th>Category</th><th>Business</th><th>Goal</th><th>Date</th><th>Amount</th><th></th></tr></thead>
           <tbody id="expBody"><tr><td colspan="7"><div class="empty">No expenses yet.</div></td></tr></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- ══ INVENTORY ══ -->
+    <div class="page" id="page-inventory">
+      <div class="ph">
+        <div>
+          <h1>Inventory</h1>
+          <p>Products and stock on hand</p>
+        </div>
+        <button class="primary sm" onclick="openModal('addInventory')">+ Add product</button>
+      </div>
+      <div class="stats-row" id="invStats" style="margin-bottom:16px; grid-template-columns: repeat(3,1fr)"></div>
+      <div id="inv-grid-wrap">
+        <div class="inv-grid" id="inv-grid"></div>
       </div>
     </div>
   </main>
@@ -1175,7 +1346,10 @@ button.ghost:hover { background: var(--bg4); color: var(--text) }
     <span class="mob-icon">◎</span>Goals
   </button>
   <button class="mob-btn" id="mob-expenses" onclick="showPage('expenses',null,'mob-expenses')">
-    <span class="mob-icon">◇</span>Expenses
+    <span class="mob-icon">◇</span>Spend
+  </button>
+  <button class="mob-btn" id="mob-inventory" onclick="showPage('inventory',null,'mob-inventory')">
+    <span class="mob-icon">▣</span>Stock
   </button>
 </nav>
 
@@ -1191,7 +1365,8 @@ let bizGoals   = [];
 let tasks      = [];
 let txns       = [];
 let expenses   = [];
-let snapshots  = [];
+let inventory  = [];
+let mrr        = [];
 
 let lineChart, pieChart, profitChart;
 let _busy = false;
@@ -1206,7 +1381,6 @@ function randomColor() {
   const usedColors = businesses.map(b => b.color);
   const unused = COLORS.filter(c => !usedColors.includes(c));
   if (unused.length) return unused[Math.floor(Math.random() * unused.length)];
-  // Generate random HSL if all preset colors used
   const hue = Math.floor(Math.random() * 360);
   return `hsl(${hue},65%,60%)`;
 }
@@ -1220,6 +1394,7 @@ const fmt  = n => {
 const fmtFull = n => '$'+(+(n||0)).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2});
 const fmtD = d => d ? new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
 const today = () => new Date().toISOString().split('T')[0];
+const thisMonth = () => new Date().toISOString().slice(0,7);
 
 // ─── AGGREGATES ─────────────────────────────────
 const bizRev  = id => txns.filter(t=>t.businessId===id&&t.type==='income').reduce((s,t)=>s+(+t.amount||0),0);
@@ -1230,7 +1405,21 @@ const totRev  = () => txns.filter(t=>t.type==='income').reduce((s,t)=>s+(+t.amou
 const totExp  = () => expenses.reduce((s,e)=>s+(+e.amount||0),0);
 const netP    = () => totRev()-totExp();
 
-// ─── TASK ORDERING ─────────────────────────────
+// MRR: latest entry per business for current month
+const bizCurrentMRR = id => {
+  const entries = mrr.filter(m => m.businessId === id && m.month === thisMonth());
+  if (!entries.length) return 0;
+  // Return the most recent entry's amount
+  const latest = entries.reduce((a, b) => {
+    const at = a.createdAt?.seconds || 0;
+    const bt = b.createdAt?.seconds || 0;
+    return bt > at ? b : a;
+  });
+  return +(latest.amount || 0);
+};
+const totalMRR = () => businesses.reduce((s, b) => s + bizCurrentMRR(b.id), 0);
+
+// ─── TASK HELPERS ───────────────────────────────
 function taskOrder(t) {
   if (t.order !== undefined && t.order !== null) return +t.order;
   if (t.createdAt?.seconds) return t.createdAt.seconds * 1000;
@@ -1238,6 +1427,51 @@ function taskOrder(t) {
 }
 function sortedTasks(arr) {
   return [...arr].sort((a,b) => taskOrder(a) - taskOrder(b));
+}
+
+// Recurring: done = lastCompleted === today
+function isTaskDone(t) {
+  if (t.recurring) return t.lastCompleted === today();
+  return !!t.done;
+}
+
+// ─── NET WORTH TIMELINE ─────────────────────────
+function buildNetWorthTimeline() {
+  const allEvents = [
+    ...txns.filter(t => t.type === 'income' && t.date).map(t => ({
+      date: t.date,
+      delta: +(t.amount || 0)
+    })),
+    ...expenses.filter(e => e.date).map(e => ({
+      date: e.date,
+      delta: -(+(e.amount || 0))
+    }))
+  ];
+
+  if (!allEvents.length) {
+    return { labels: ['Today'], data: [0] };
+  }
+
+  allEvents.sort((a, b) => a.date.localeCompare(b.date));
+
+  // Group deltas by date
+  const byDate = {};
+  allEvents.forEach(ev => {
+    byDate[ev.date] = (byDate[ev.date] || 0) + ev.delta;
+  });
+
+  const dates = Object.keys(byDate).sort();
+  let running = 0;
+  const labels = [];
+  const data = [];
+
+  dates.forEach(d => {
+    running += byDate[d];
+    labels.push(fmtD(d));
+    data.push(running);
+  });
+
+  return { labels, data };
 }
 
 // ─── BOOT ───────────────────────────────────────
@@ -1249,7 +1483,8 @@ window.addEventListener('db-ready', () => {
   db.listen('tasks',      d=>{tasks=d;renderAll()});
   db.listen('txns',       d=>{txns=d;renderAll()});
   db.listen('expenses',   d=>{expenses=d;renderAll()});
-  db.listen('snapshots',  d=>{snapshots=d;renderAll()});
+  db.listen('inventory',  d=>{inventory=d;renderAll()});
+  db.listen('mrr',        d=>{mrr=d;renderAll()});
   initCharts();
 });
 setTimeout(()=>{
@@ -1264,6 +1499,11 @@ function setDot(c,t){
   document.getElementById('statusText').textContent=t;
 }
 
+// ─── ESC to close modal ──────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
 // ─── RENDER ALL ─────────────────────────────────
 function renderAll(){
   renderStats();
@@ -1277,11 +1517,13 @@ function renderAll(){
   renderTxList();
   renderExpenses();
   renderExpStats();
+  renderInventory();
+  renderInvStats();
 }
 
 // ─── STATS ──────────────────────────────────────
 function renderStats(){
-  const r=totRev(), e=totExp(), n=netP();
+  const r=totRev(), e=totExp(), n=netP(), m=totalMRR();
   document.getElementById('s-rev').textContent=fmtFull(r);
   document.getElementById('s-exp').textContent=fmtFull(e);
   const nel=document.getElementById('s-net');
@@ -1290,6 +1532,8 @@ function renderStats(){
   document.getElementById('s-net-sub').textContent=n>=0?'in profit':'in loss';
   document.getElementById('s-rev-sub').textContent=`${businesses.length} business${businesses.length!==1?'es':''}`;
   document.getElementById('s-exp-sub').textContent=`${expenses.length} transaction${expenses.length!==1?'s':''}`;
+  document.getElementById('s-mrr').textContent=fmtFull(m);
+  document.getElementById('s-mrr-sub').textContent=m > 0 ? `${businesses.filter(b=>bizCurrentMRR(b.id)>0).length} active` : 'no data yet';
 }
 
 function renderBanner(){
@@ -1325,11 +1569,10 @@ function initCharts(){
       responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtFull(c.parsed.y)},backgroundColor:'#1c1c1c',borderColor:'#333',borderWidth:1,titleColor:'#888',bodyColor:'#e8e8e8'}},
       scales:{
-        x:{grid:{color:grid},ticks:{color:tick,font:{size:10,family:'IBM Plex Mono'},maxRotation:0}},
+        x:{grid:{color:grid},ticks:{color:tick,font:{size:10,family:'IBM Plex Mono'},maxRotation:0,maxTicksLimit:8}},
         y:{
           grid:{color:grid},
-          ticks:{color:tick,font:{size:10,family:'IBM Plex Mono'},callback:v=>fmt(v)},
-          // Allow negative values — no min constraint
+          ticks:{color:tick,font:{size:10,family:'IBM Plex Mono'},callback:v=>fmt(v)}
         }
       }
     }
@@ -1356,9 +1599,11 @@ function initCharts(){
 
 function renderCharts(){
   if(!lineChart) return;
-  const sorted=[...snapshots].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
-  lineChart.data.labels=sorted.length?sorted.map(s=>fmtD(s.date)):['Today'];
-  lineChart.data.datasets[0].data=sorted.length?sorted.map(s=>+s.amount||0):[netP()];
+
+  // Build net worth timeline from actual transactions
+  const timeline = buildNetWorthTimeline();
+  lineChart.data.labels = timeline.labels;
+  lineChart.data.datasets[0].data = timeline.data;
   lineChart.update();
 
   // Revenue pie
@@ -1381,7 +1626,7 @@ function renderCharts(){
   }
   pieChart.update();
 
-  // Profit pie (net per business, only positive)
+  // Profit pie
   const bwp=businesses.filter(b=>(bizRev(b.id)-bizExp(b.id))>0);
   const pl=document.getElementById('profitLegend');
   if(bwp.length){
@@ -1412,11 +1657,12 @@ function renderHomeBiz(){
   el.innerHTML=businesses.map(b=>{
     const r=bizRev(b.id), e=bizExp(b.id), n=r-e;
     const gc=bizGoals.filter(g=>g.businessId===b.id).length;
+    const m=bizCurrentMRR(b.id);
     return `<div class="biz-row">
       <div class="biz-dot" style="background:${b.color||'#4ade80'}"></div>
       <div class="biz-name-cell">
         <div class="name">${b.name}</div>
-        <div class="meta">${gc} goal${gc!==1?'s':''}</div>
+        <div class="meta">${gc} goal${gc!==1?'s':''}${m>0?' · MRR '+fmt(m):''}</div>
       </div>
       <div class="biz-num"><div class="lbl">Rev</div><div class="val tg">${fmt(r)}</div></div>
       <div class="biz-num"><div class="lbl">Exp</div><div class="val tr">${fmt(e)}</div></div>
@@ -1430,15 +1676,20 @@ function switchHomeFreq(freq) {
   ['daily','weekly','monthly'].forEach(f=>{
     document.getElementById('ht-'+f[0]).classList.toggle('active', f===freq);
   });
+  document.getElementById('ht-r').classList.toggle('active', freq === 'recurring');
   renderHomeTasks();
 }
 
 function renderHomeTasks(){
   const el=document.getElementById('home-tasks');
-  const freqTasks=tasks.filter(t=>!t.businessId && (t.frequency||'daily')===homeFreq);
-  const st=sortedTasks(freqTasks);
+  let st;
+  if (homeFreq === 'recurring') {
+    st = sortedTasks(tasks.filter(t => !t.businessId && t.recurring));
+  } else {
+    st = sortedTasks(tasks.filter(t => !t.businessId && !t.recurring && (t.frequency||'daily') === homeFreq));
+  }
   if(!st.length){
-    el.innerHTML=`<div class="empty-sm">No ${homeFreq} tasks yet.</div>`;
+    el.innerHTML=`<div class="empty-sm">No ${homeFreq === 'recurring' ? 'recurring' : homeFreq} tasks yet.</div>`;
     return;
   }
   el.innerHTML=st.map(t=>taskHtml(t, homeFreq)).join('');
@@ -1478,11 +1729,9 @@ async function dragDrop(e, targetId) {
   const srcId = _dragId || e.dataTransfer.getData('text/plain');
   if(!srcId || srcId === targetId) return;
 
-  // Get the sorted list containing these tasks (figure out which group)
   const srcTask = tasks.find(t=>t.id===srcId);
   const tgtTask = tasks.find(t=>t.id===targetId);
   if(!srcTask || !tgtTask) return;
-  // Must be same group (same businessId and frequency)
   if(srcTask.businessId !== tgtTask.businessId) return;
 
   const freq = srcTask.frequency || 'daily';
@@ -1495,12 +1744,10 @@ async function dragDrop(e, targetId) {
   const tgtIdx = grp.findIndex(t=>t.id===targetId);
   if(srcIdx<0||tgtIdx<0) return;
 
-  // Remove src from array, insert at target position
   const reordered = [...grp];
   const [moved] = reordered.splice(srcIdx, 1);
   reordered.splice(tgtIdx, 0, moved);
 
-  // Assign new order values and batch-update only changed tasks
   const updates = [];
   reordered.forEach((t, i) => {
     const newOrder = (i+1) * 1000;
@@ -1512,9 +1759,12 @@ async function dragDrop(e, targetId) {
 }
 
 // ─── TASK HTML ───────────────────────────────────
-function taskHtml(t, freq) {
-  const f = freq || t.frequency || 'daily';
-  return `<div class="task-item${t.done?' faded':''}"
+function taskHtml(t) {
+  const done = isTaskDone(t);
+  const recurringBadge = t.recurring
+    ? `<span class="recurring-badge" title="Resets daily">↺</span>`
+    : '';
+  return `<div class="task-item${done?' faded':''}"
     data-id="${t.id}"
     draggable="true"
     ondragstart="dragStart(event,'${t.id}')"
@@ -1522,8 +1772,9 @@ function taskHtml(t, freq) {
     ondrop="dragDrop(event,'${t.id}')"
     ondragend="dragEnd(event)">
     <div class="drag-handle" title="Drag to reorder">⠿</div>
-    <div class="task-check${t.done?' on':''}" onclick="toggleTask('${t.id}')"></div>
-    <span class="task-text${t.done?' struck':''}" onclick="toggleTask('${t.id}')">${escHtml(t.text)}</span>
+    <div class="task-check${done?' on':''}" onclick="toggleTask('${t.id}')"></div>
+    <span class="task-text${done?' struck':''}" onclick="toggleTask('${t.id}')">${escHtml(t.text)}</span>
+    ${recurringBadge}
     <button class="task-del" onclick="delTask('${t.id}')">✕</button>
   </div>`;
 }
@@ -1535,10 +1786,34 @@ function escHtml(s) {
 // ─── DAILY TASKS (TASKS PAGE) ───────────────────
 function renderDailyTasks(){
   const el=document.getElementById('daily-list');
-  const personal=tasks.filter(t=>!t.businessId);
+  const personal=tasks.filter(t=>!t.businessId && !t.recurring);
+  const recurring=sortedTasks(tasks.filter(t=>!t.businessId && t.recurring));
   const fromBiz =tasks.filter(t=>t.businessId);
   let html='';
 
+  // ── Recurring section
+  html += `<div style="margin-bottom:20px">
+    <div class="sec-hdr" style="margin-bottom:10px">
+      <span class="sec-label" style="color:var(--blue)">↺ Recurring Daily</span>
+      <button class="primary sm" onclick="openModal('addRecurringTask')">+ Add</button>
+    </div>`;
+  if(!recurring.length) {
+    html += `<div class="empty-sm" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px">No recurring tasks yet. These reset every day.</div>`;
+  } else {
+    const doneCount = recurring.filter(t => isTaskDone(t)).length;
+    html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+      <div style="padding:8px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--t3)">${doneCount}/${recurring.length} done today</span>
+        <button class="act-btn" onclick="resetAllRecurring()" style="font-size:9px">Reset all</button>
+      </div>
+      <div style="padding:4px 12px">
+        ${recurring.map(t=>taskHtml(t)).join('')}
+      </div>
+    </div>`;
+  }
+  html += '</div>';
+
+  // ── Regular frequency groups
   ['daily','weekly','monthly'].forEach(freq=>{
     const grp = sortedTasks(personal.filter(t=>(t.frequency||'daily')===freq));
     html += `<div style="margin-bottom:20px">
@@ -1550,7 +1825,7 @@ function renderDailyTasks(){
       html += `<div class="empty-sm" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px">No ${freq} tasks yet.</div>`;
     } else {
       html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px 12px">
-        ${grp.map(t=>taskHtml(t,freq)).join('')}
+        ${grp.map(t=>taskHtml(t)).join('')}
       </div>`;
     }
     html += '</div>';
@@ -1604,6 +1879,7 @@ function renderBizTab(){
         <div class="biz-hdr-acts" onclick="event.stopPropagation()">
           <button class="ghost" onclick="openModal('addBizGoal','${b.id}')">+ Goal</button>
           <button class="ghost" onclick="openModal('addBizTask','${b.id}')">+ Task</button>
+          <button class="ghost" onclick="openModal('logMRR','${b.id}')">↺ MRR</button>
           <button class="ghost" style="color:var(--red)" onclick="delBiz('${b.id}')">✕</button>
         </div>
         <span style="font-family:var(--mono);color:var(--t3);font-size:10px;margin-left:4px">${isOpen?'▴':'▾'}</span>
@@ -1694,13 +1970,13 @@ function switchTaskTab(tab){
 function renderFinancials(){
   const tbody=document.getElementById('finBody');
   if(!businesses.length){
-    tbody.innerHTML='<tr><td colspan="5"><div class="empty">No businesses yet.</div></td></tr>';
+    tbody.innerHTML='<tr><td colspan="6"><div class="empty">No businesses yet.</div></td></tr>';
     document.getElementById('finFoot').innerHTML='';
     return;
   }
   let rows='';
   businesses.forEach(b=>{
-    const r=bizRev(b.id), e=bizExp(b.id), n=r-e;
+    const r=bizRev(b.id), e=bizExp(b.id), n=r-e, m=bizCurrentMRR(b.id);
     rows+=`<tr style="background:var(--bg3)">
       <td style="font-weight:600">
         <div style="display:flex;align-items:center;gap:8px">
@@ -1711,9 +1987,11 @@ function renderFinancials(){
       <td class="mono tg">${fmtFull(r)}</td>
       <td class="mono tr">${fmtFull(e)}</td>
       <td class="mono ${n>=0?'tg':'tr'}">${n>=0?'+':''}${fmtFull(n)}</td>
+      <td class="mono tb">${m>0?fmtFull(m):'—'}</td>
       <td>
         <button class="act-btn" onclick="openModal('logIncome','','${b.id}')">+ Income</button>
         <button class="act-btn" onclick="openModal('logExpense','','${b.id}')">− Expense</button>
+        <button class="act-btn" onclick="openModal('logMRR','${b.id}')">↺ MRR</button>
       </td>
     </tr>`;
     bizGoals.filter(g=>g.businessId===b.id).forEach(g=>{
@@ -1723,37 +2001,45 @@ function renderFinancials(){
         <td class="mono tg">${fmtFull(gr)}</td>
         <td class="mono tr">${fmtFull(ge)}</td>
         <td class="mono ${gn>=0?'tg':'tr'}">${gn>=0?'+':''}${fmtFull(gn)}</td>
+        <td>—</td>
         <td><button class="act-btn" onclick="openModal('logIncome','${g.id}','${b.id}')">+ Income</button></td>
       </tr>`;
     });
   });
   tbody.innerHTML=rows;
-  const tr=totRev(), te=totExp(), tn=netP();
+  const tr=totRev(), te=totExp(), tn=netP(), tm=totalMRR();
   document.getElementById('finFoot').innerHTML=`<tr>
     <td style="font-weight:600;font-family:var(--mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--t3)">Total</td>
     <td class="mono tg" style="font-weight:600">${fmtFull(tr)}</td>
     <td class="mono tr" style="font-weight:600">${fmtFull(te)}</td>
     <td class="mono ${tn>=0?'tg':'tr'}" style="font-weight:600">${tn>=0?'+':''}${fmtFull(tn)}</td>
+    <td class="mono tb" style="font-weight:600">${tm>0?fmtFull(tm):'—'}</td>
     <td></td>
   </tr>`;
 }
 
 function renderTxList(){
   const el=document.getElementById('txList');
-  if(!txns.length){el.innerHTML='<div class="empty">No transactions yet.</div>';return;}
-  const sorted=[...txns].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  el.innerHTML=sorted.map(t=>{
+  if(!txns.length&&!mrr.length){el.innerHTML='<div class="empty">No transactions yet.</div>';return;}
+  // Combine txns and mrr entries for display
+  const allItems = [
+    ...txns.map(t=>({...t,_type:'txn'})),
+    ...mrr.map(m=>({...m,_type:'mrr',type:'mrr',date:m.month+'-01',amount:m.amount,desc:'MRR: '+(m.desc||m.month)}))
+  ].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  el.innerHTML=allItems.map(t=>{
     const biz=businesses.find(b=>b.id===t.businessId);
     const g=bizGoals.find(x=>x.id===t.bizGoalId);
-    const inc=t.type==='income';
+    const isMRR = t._type === 'mrr';
+    const inc = t.type==='income' || isMRR;
+    const dotColor = isMRR ? 'var(--blue)' : (inc?'var(--green)':'var(--red)');
     return `<div class="tx-item">
-      <div class="tx-dot" style="background:${inc?'var(--green)':'var(--red)'}"></div>
+      <div class="tx-dot" style="background:${dotColor}"></div>
       <div style="flex:1;min-width:0">
         <div class="tx-label">${escHtml(t.desc||(inc?'Income':'Expense'))}</div>
         <div class="tx-sub">${biz?escHtml(biz.name):'—'}${g?' · '+escHtml(g.name):''} · ${fmtD(t.date)}</div>
       </div>
-      <div class="tx-amt ${inc?'tg':'tr'}">${inc?'+':'−'}${fmtFull(t.amount)}</div>
-      <button class="act-btn del" onclick="delTxn('${t.id}')">✕</button>
+      <div class="tx-amt" style="color:${dotColor}">${isMRR?'↺':inc?'+':'−'}${fmtFull(t.amount)}</div>
+      <button class="act-btn del" onclick="${isMRR?'delMRR':'delTxn'}('${t.id}')">✕</button>
     </div>`;
   }).join('');
 }
@@ -1762,13 +2048,16 @@ function renderExpenses(){
   const tbody=document.getElementById('expBody');
   if(!expenses.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty">No expenses yet.</div></td></tr>';return;}
   const sorted=[...expenses].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  const cc={tools:'ct',ads:'ca',software:'cs',other:'co'};
+  const cc={tools:'ct',ads:'ca',software:'cs',other:'co',shipping:'cm',custom:'co'};
   tbody.innerHTML=sorted.map(e=>{
     const biz=businesses.find(b=>b.id===e.businessId);
     const g=bizGoals.find(x=>x.id===e.bizGoalId);
+    // Display custom other label if present
+    const catDisplay = (e.category==='other' && e.otherLabel) ? e.otherLabel : (e.category||'other');
+    const catClass = cc[e.category] || 'co';
     return `<tr>
       <td>${escHtml(e.desc||'—')}</td>
-      <td><span class="exp-cat ${cc[e.category]||'co'}">${e.category||'other'}</span></td>
+      <td><span class="exp-cat ${catClass}">${escHtml(catDisplay)}</span></td>
       <td class="tm mono">${biz?escHtml(biz.name):'—'}</td>
       <td class="tm mono">${g?escHtml(g.name):'—'}</td>
       <td class="tm mono">${fmtD(e.date)}</td>
@@ -1780,7 +2069,7 @@ function renderExpenses(){
 
 function renderExpStats(){
   const el=document.getElementById('expStats');
-  const cats=['tools','ads','software','other'];
+  const cats=['tools','ads','software','shipping','other'];
   el.innerHTML=cats.map(c=>{
     const t=expenses.filter(e=>e.category===c).reduce((s,e)=>s+(+e.amount||0),0);
     return `<div class="stat-card">
@@ -1790,10 +2079,84 @@ function renderExpStats(){
   }).join('');
 }
 
+// ─── INVENTORY ──────────────────────────────────
+const INV_CATS = ['cologne','3d prints','apparel','accessories','electronics','raw materials','other'];
+
+function renderInventory(){
+  const el = document.getElementById('inv-grid');
+  if(!inventory.length){
+    el.innerHTML='<div class="empty" style="grid-column:1/-1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r)">No products yet. Hit "+ Add product" to track your stock.</div>';
+    return;
+  }
+  el.innerHTML = inventory.map(item => {
+    const qty = +(item.quantity || 0);
+    const isLow = qty <= 2 && qty >= 0;
+    const isOut = qty <= 0;
+    let qtyColor = 'var(--text)';
+    if (isOut) qtyColor = 'var(--red)';
+    else if (isLow) qtyColor = 'var(--amber)';
+    return `<div class="inv-card${isLow?' low':''}">
+      <button class="inv-del-btn" onclick="delInvItem('${item.id}')">✕</button>
+      ${isOut ? '<span class="low-badge">OUT OF STOCK</span>' : isLow ? '<span class="low-badge">LOW STOCK</span>' : ''}
+      <div class="inv-name">${escHtml(item.name)}</div>
+      <div class="inv-cat">${escHtml(item.category||'other')}</div>
+      ${item.notes ? `<div class="inv-notes">${escHtml(item.notes)}</div>` : ''}
+      <div class="inv-qty-row">
+        <button class="qty-btn minus" onclick="updateQty('${item.id}', -1)">−</button>
+        <div style="flex:1;text-align:center">
+          <div class="inv-qty" style="color:${qtyColor}">${qty}</div>
+          <div class="inv-unit">${escHtml(item.unit||'units')}</div>
+        </div>
+        <button class="qty-btn plus" onclick="updateQty('${item.id}', 1)">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderInvStats(){
+  const el = document.getElementById('invStats');
+  const total = inventory.length;
+  const low = inventory.filter(i => +(i.quantity||0) <= 2 && +(i.quantity||0) > 0).length;
+  const outOf = inventory.filter(i => +(i.quantity||0) <= 0).length;
+  el.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Products</div>
+      <div class="stat-value">${total}</div>
+      <div class="stat-sub">tracked items</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Low Stock</div>
+      <div class="stat-value ${low>0?'':'green'}" style="${low>0?'color:var(--amber)':''}">${low}</div>
+      <div class="stat-sub">≤ 2 remaining</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Out of Stock</div>
+      <div class="stat-value ${outOf>0?'red':'green'}">${outOf}</div>
+      <div class="stat-sub">need to restock</div>
+    </div>`;
+}
+
+async function updateQty(id, delta){
+  const item = inventory.find(i => i.id === id);
+  if (!item) return;
+  const newQty = Math.max(0, (+(item.quantity||0)) + delta);
+  try { await window._db.update('inventory', id, { quantity: newQty }); } catch(e) {}
+}
+
+async function delInvItem(id){
+  if(!confirm('Remove this product from inventory?')) return;
+  try { await window._db.del('inventory', id); toast('Removed'); } catch(e) {}
+}
+
 // ─── TASK ACTIONS ────────────────────────────────
 async function toggleTask(id){
   const t=tasks.find(x=>x.id===id); if(!t)return;
-  try{await window._db.update('tasks',id,{done:!t.done})}catch(e){}
+  if (t.recurring) {
+    const newVal = t.lastCompleted === today() ? null : today();
+    try { await window._db.update('tasks', id, { lastCompleted: newVal }); } catch(e) {}
+  } else {
+    try { await window._db.update('tasks', id, { done: !t.done }); } catch(e) {}
+  }
 }
 async function delTask(id){
   try{await window._db.del('tasks',id)}catch(e){}
@@ -1802,11 +2165,26 @@ async function quickAddTask(){
   const inp=document.getElementById('home-task-input');
   const text=inp?.value.trim();
   if(!text) return;
-  try{
-    await window._db.add('tasks',{text,done:false,frequency:homeFreq,order:Date.now()});
-    inp.value='';
-    toast('Task added ✓');
-  }catch(e){toast('Error adding task')}
+  if (homeFreq === 'recurring') {
+    try{
+      await window._db.add('tasks',{text,recurring:true,lastCompleted:null,order:Date.now()});
+      inp.value='';
+      toast('Recurring task added ✓');
+    }catch(e){toast('Error')}
+  } else {
+    try{
+      await window._db.add('tasks',{text,done:false,frequency:homeFreq,order:Date.now()});
+      inp.value='';
+      toast('Task added ✓');
+    }catch(e){toast('Error')}
+  }
+}
+async function resetAllRecurring(){
+  const recurring = tasks.filter(t => !t.businessId && t.recurring && t.lastCompleted === today());
+  try {
+    await Promise.all(recurring.map(t => window._db.update('tasks', t.id, { lastCompleted: null })));
+    toast('All recurring tasks reset');
+  } catch(e) { toast('Error') }
 }
 
 // ─── BIZ GOAL ACTIONS ───────────────────────────
@@ -1840,7 +2218,6 @@ async function delBizGoal(id){
   if(!confirm('Delete this goal and its transactions?'))return;
   try{
     await window._db.del('bizGoals',id);
-    // Clean up related transactions
     for(const t of txns.filter(t=>t.bizGoalId===id)) await window._db.del('txns',t.id);
     for(const e of expenses.filter(e=>e.bizGoalId===id)) await window._db.del('expenses',e.id);
     toast('Goal deleted');
@@ -1864,13 +2241,9 @@ async function delBiz(id){
   }catch(e){toast('Error')}
 }
 async function delTxn(id){ try{await window._db.del('txns',id)}catch(e){} }
+async function delMRR(id){ try{await window._db.del('mrr',id)}catch(e){} }
 async function delExp(id){
-  try{
-    await window._db.del('expenses',id);
-    // Also remove matching txn entry if exists
-    const match = txns.find(t=>t.type==='expense' && t.id===id);
-    if(match) await window._db.del('txns',id);
-  }catch(e){}
+  try{ await window._db.del('expenses',id); }catch(e){}
 }
 
 // ─── GOAL HISTORY ────────────────────────────────
@@ -1904,10 +2277,7 @@ function openGoalHistory(gid){
 }
 
 // ─── MODALS ─────────────────────────────────────
-function openModal(type, arg1, arg2, arg3){
-  // arg meanings per modal type:
-  // addTask(freq), addBizTask(bizId), addBusiness(), addBizGoal(bizId)
-  // logIncome(goalId, bizId), logExpense(goalId, bizId)
+function openModal(type, arg1, arg2){
   const box=document.getElementById('modalBox');
 
   if(type==='addTask'){
@@ -1915,6 +2285,12 @@ function openModal(type, arg1, arg2, arg3){
     box.innerHTML=`<h2>New ${freq} task</h2>
       <div class="fr"><label>Task</label><input type="text" id="m-t" placeholder="e.g. Reply to emails" onkeydown="if(event.key==='Enter')saveTask('${freq}')"></div>
       <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveTask('${freq}')">Add task</button></div>`;
+  }
+  else if(type==='addRecurringTask'){
+    box.innerHTML=`<h2>New recurring daily task</h2>
+      <p style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:14px">This task resets every day. Delete it when you no longer need it.</p>
+      <div class="fr"><label>Task</label><input type="text" id="m-t" placeholder="e.g. Post on social media" onkeydown="if(event.key==='Enter')saveRecurringTask()"></div>
+      <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveRecurringTask()">Add recurring</button></div>`;
   }
   else if(type==='addBizTask'){
     const bizId=arg1||'';
@@ -1938,7 +2314,6 @@ function openModal(type, arg1, arg2, arg3){
       <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveBizGoal('${bizId}')">Add goal</button></div>`;
   }
   else if(type==='logIncome'){
-    // arg1 = goalId (optional), arg2 = bizId (optional)
     const preGoal=arg1||'';
     const preBiz=arg2||(bizGoals.find(g=>g.id===preGoal)?.businessId)||'';
     const bizOpts=businesses.map(b=>`<option value="${b.id}" ${b.id===preBiz?'selected':''}>${escHtml(b.name)}</option>`).join('');
@@ -1967,15 +2342,76 @@ function openModal(type, arg1, arg2, arg3){
         <div class="fr"><label>Date</label><input type="date" id="m-date" value="${today()}"></div>
       </div>
       <div class="g2">
-        <div class="fr"><label>Category</label><select id="m-cat"><option value="tools">Tools</option><option value="ads">Ads</option><option value="software">Software</option><option value="other">Other</option></select></div>
-        <div class="fr"><label>Business</label><select id="m-biz" onchange="updateGoalOpts()"><option value="">— None —</option>${bizOpts}</select></div>
+        <div class="fr">
+          <label>Category</label>
+          <select id="m-cat" onchange="toggleOtherLabel()">
+            <option value="tools">Tools</option>
+            <option value="ads">Ads</option>
+            <option value="software">Software</option>
+            <option value="shipping">Shipping</option>
+            <option value="other">Other…</option>
+          </select>
+        </div>
+        <div class="fr" id="other-label-wrap" style="display:none">
+          <label>What kind of expense?</label>
+          <input type="text" id="m-other-label" placeholder="e.g. Packaging, Materials…">
+        </div>
+        <div class="fr" id="biz-wrap" style="${!document.getElementById('m-other-label')?'':''}">
+          <label>Business</label>
+          <select id="m-biz" onchange="updateGoalOpts()"><option value="">— None —</option>${bizOpts}</select>
+        </div>
       </div>
       <div class="fr"><label>Goal (optional)</label><select id="m-goal"><option value="">— None —</option>${allGoalOpts}</select></div>
       <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveExpense()">Log expense</button></div>`;
   }
+  else if(type==='logMRR'){
+    const preBiz = arg1 || '';
+    const bizOpts = businesses.map(b=>`<option value="${b.id}" ${b.id===preBiz?'selected':''}>${escHtml(b.name)}</option>`).join('');
+    const mth = thisMonth();
+    box.innerHTML=`<h2>Log MRR</h2>
+      <p style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:14px">Enter your current monthly recurring revenue for this business. This replaces the previous entry for the selected month.</p>
+      <div class="fr"><label>Business</label><select id="m-biz"><option value="">— None —</option>${bizOpts}</select></div>
+      <div class="g2">
+        <div class="fr"><label>MRR Amount ($)</label><input type="number" id="m-amt" placeholder="0.00" min="0" step="0.01"></div>
+        <div class="fr"><label>Month</label><input type="month" id="m-month" value="${mth}"></div>
+      </div>
+      <div class="fr"><label>Note (optional)</label><input type="text" id="m-desc" placeholder="e.g. 3 new subscribers"></div>
+      <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveMRR()">Save MRR</button></div>`;
+  }
+  else if(type==='addInventory'){
+    const catOpts = INV_CATS.map(c=>`<option value="${c}">${c}</option>`).join('');
+    box.innerHTML=`<h2>Add product</h2>
+      <div class="fr"><label>Product name</label><input type="text" id="m-t" placeholder="e.g. Noir Cologne — 2oz"></div>
+      <div class="g2">
+        <div class="fr"><label>Category</label><select id="m-cat">${catOpts}</select></div>
+        <div class="fr"><label>Unit label</label><input type="text" id="m-unit" placeholder="bottles, pieces, prints…"></div>
+      </div>
+      <div class="g2">
+        <div class="fr"><label>Starting quantity</label><input type="number" id="m-qty" placeholder="0" min="0" step="1" value="0"></div>
+        <div class="fr"><label>Low stock alert at</label><input type="number" id="m-low" placeholder="2" min="0" step="1" value="2"></div>
+      </div>
+      <div class="fr"><label>Notes (optional)</label><input type="text" id="m-notes" placeholder="e.g. Batch #3, expires 2025…"></div>
+      <div class="modal-footer"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="m-btn" onclick="saveInventory()">Add product</button></div>`;
+  }
 
   document.getElementById('modalOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('modalBox').querySelector('input,select')?.focus(),50);
+}
+
+function toggleOtherLabel() {
+  const cat = document.getElementById('m-cat')?.value;
+  const wrap = document.getElementById('other-label-wrap');
+  const bizWrap = document.getElementById('biz-wrap');
+  if (wrap) wrap.style.display = cat === 'other' ? '' : 'none';
+  // Move business field
+  if (bizWrap) {
+    if (cat === 'other') {
+      bizWrap.style.display = 'none';
+      // Move to next row after other label
+    } else {
+      bizWrap.style.display = '';
+    }
+  }
 }
 
 function updateGoalOpts() {
@@ -2021,6 +2457,15 @@ async function saveTask(freq){
     closeModal();toast('Task added ✓');
   }catch(e){toast('Error');unlock('Add task')}
 }
+async function saveRecurringTask(){
+  if(!lock('Adding…'))return;
+  const text=document.getElementById('m-t')?.value.trim();
+  if(!text){unlock('Add recurring');return}
+  try{
+    await window._db.add('tasks',{text,recurring:true,lastCompleted:null,order:Date.now()});
+    closeModal();toast('Recurring task added ✓');
+  }catch(e){toast('Error');unlock('Add recurring')}
+}
 async function saveBizTask(bizId){
   if(!lock('Adding…'))return;
   const text=document.getElementById('m-t')?.value.trim();
@@ -2046,7 +2491,6 @@ async function saveBizGoal(bizId){
   try{
     await window._db.add('bizGoals',{name,businessId:bizId,done:false,subtasks:[],_open:false});
     closeModal();toast('Goal added ✓');
-    // Auto-expand the business so user can see it
     const biz=businesses.find(b=>b.id===bizId);
     if(biz&&!biz._open) await window._db.update('businesses',bizId,{_open:true});
   }catch(e){toast('Error');unlock('Add goal')}
@@ -2074,9 +2518,36 @@ async function saveExpense(){
     const desc=document.getElementById('m-desc')?.value.trim()||'';
     const date=document.getElementById('m-date')?.value||today();
     const cat=document.getElementById('m-cat')?.value||'other';
-    await window._db.add('expenses',{desc,amount:amt,date,category:cat,businessId:bid,bizGoalId:gid});
+    const otherLabel=cat==='other'?(document.getElementById('m-other-label')?.value.trim()||''):'';
+    await window._db.add('expenses',{desc,amount:amt,date,category:cat,otherLabel,businessId:bid,bizGoalId:gid});
     closeModal();toast('Expense logged ✓');
   }catch(e){toast('Error');unlock('Log expense')}
+}
+async function saveMRR(){
+  if(!lock('Saving…'))return;
+  const amt=parseFloat(document.getElementById('m-amt')?.value);
+  if(!amt||amt<0){unlock('Save MRR');return}
+  try{
+    const bid=document.getElementById('m-biz')?.value||'';
+    const month=document.getElementById('m-month')?.value||thisMonth();
+    const desc=document.getElementById('m-desc')?.value.trim()||'';
+    await window._db.add('mrr',{businessId:bid,amount:amt,month,desc});
+    closeModal();toast('MRR saved ✓');
+  }catch(e){toast('Error');unlock('Save MRR')}
+}
+async function saveInventory(){
+  if(!lock('Adding…'))return;
+  const name=document.getElementById('m-t')?.value.trim();
+  if(!name){unlock('Add product');return}
+  try{
+    const category=document.getElementById('m-cat')?.value||'other';
+    const unit=document.getElementById('m-unit')?.value.trim()||'units';
+    const quantity=parseInt(document.getElementById('m-qty')?.value)||0;
+    const lowAt=parseInt(document.getElementById('m-low')?.value)||2;
+    const notes=document.getElementById('m-notes')?.value.trim()||'';
+    await window._db.add('inventory',{name,category,unit,quantity,lowAt,notes});
+    closeModal();toast('Product added ✓');
+  }catch(e){toast('Error');unlock('Add product')}
 }
 
 // ─── NAV ────────────────────────────────────────
@@ -2089,7 +2560,7 @@ function showPage(name, sidebarBtn, mobBtnId){
   if(mobBtnId) document.getElementById(mobBtnId)?.classList.add('active');
   // Sync sidebar button
   const sidebarBtns = document.querySelectorAll('.sidebar .nav-item');
-  const pageOrder = ['home','financial','tasks','expenses'];
+  const pageOrder = ['home','financial','tasks','expenses','inventory'];
   const idx = pageOrder.indexOf(name);
   if(idx>=0 && sidebarBtns[idx]) sidebarBtns[idx].classList.add('active');
   if(name==='tasks') switchTaskTab(currentTab);
